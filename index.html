@@ -142,7 +142,7 @@
             transform: translateY(-2px);
         }
 
-        /* Admin Login Styles (keep original) */
+        /* Admin Login Styles */
         #adminLoginForm {
             display: none;
         }
@@ -455,7 +455,7 @@
             box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
         }
 
-        /* Admin Panel Styles (unchanged) */
+        /* Admin Panel Styles */
         .admin-panel { 
             margin-top: 20px; 
             padding-top: 20px; 
@@ -794,61 +794,6 @@
             box-shadow: none;
         }
 
-        .request-item {
-            background: #f8f9fa;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 4px solid #ffc107;
-        }
-
-        .request-actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .approve-btn {
-            background: #28a745 !important;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .deny-btn {
-            background: #dc3545 !important;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .warn-btn {
-            background: #ffc107 !important;
-            color: #212529;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .mute-btn {
-            background: #6f42c1 !important;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
         .notification-toast {
             position: fixed;
             top: 20px;
@@ -888,6 +833,8 @@
 <body>
     <div class="container">
         <div class="header">
+            <h1>منصة النقاط الذكية</h1>
+            <p>نظام إدارة النقاط والترتيب</p>
         </div>
 
         <div class="content">
@@ -906,7 +853,7 @@
                     <a href="#" onclick="showAdminLogin()" class="admin-link">إدارة النظام</a>
                 </div>
 
-                <!-- Admin Login (unchanged) -->
+                <!-- Admin Login -->
                 <div id="adminLoginForm">
                     <form id="adminLoginFormElement">
                         <input type="email" id="adminEmail" placeholder="Email" required>
@@ -921,7 +868,7 @@
             <div id="profile" class="user-profile">
                 <div id="userInfo"></div>
 
-                <!-- All Users Points Section (visible only to regular users) -->
+                <!-- All Users Points Section -->
                 <div id="allUsersPointsSection" style="display: none;">
                     <div class="points-section">
                         <div class="points-header">
@@ -931,7 +878,7 @@
                     </div>
                 </div>
 
-                <!-- Admin Panel (unchanged styling) -->
+                <!-- Admin Panel -->
                 <div id="adminPanel" style="display: none;" class="admin-panel">
                     <h3>🔧 Admin Panel</h3>
 
@@ -962,8 +909,6 @@
                             </form>
                         </div>
                     </div>
-
-                    
 
                     <!-- Point Requests Management -->
                     <div class="admin-section">
@@ -1025,7 +970,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where, deleteDoc, updateDoc, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -1044,33 +989,7 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-
-        // Helper function to get current user
-        function getCurrentUser() {
-            return currentUser;
-        }
-
-        // Check for saved session on page load
-        function checkSavedSession() {
-            const savedSession = localStorage.getItem('userSession');
-            if (savedSession) {
-                try {
-                    const userData = JSON.parse(savedSession);
-                    if (userData.loginType === 'displayName') {
-                        currentUser = {
-                            uid: userData.uid,
-                            email: userData.email
-                        };
-                        showProfile(userData);
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error parsing saved session:', error);
-                    localStorage.removeItem('userSession');
-                }
-            }
-            return false;
-        }
+        let isAdmin = false;
 
         // Show message
         function showMessage(message, type = 'success') {
@@ -1088,8 +1007,8 @@
         }
 
         // Arabic ranking system
-        function getRankInfo(points, isAdmin = false) {
-            if (isAdmin) {
+        function getRankInfo(points, isAdminUser = false) {
+            if (isAdminUser) {
                 return {
                     name: 'المدير',
                     nameEn: 'Admin',
@@ -1110,8 +1029,7 @@
                 { name: 'بطل', nameEn: 'Champion', color: '#dc3545', icon: '👑', minPoints: 1500 }
             ];
 
-            // Find the appropriate rank based on points
-            let currentRank = ranks[0]; // Default to first rank
+            let currentRank = ranks[0];
             for (let i = ranks.length - 1; i >= 0; i--) {
                 if (points >= ranks[i].minPoints) {
                     currentRank = ranks[i];
@@ -1119,7 +1037,6 @@
                 }
             }
 
-            // Calculate next rank info
             const currentIndex = ranks.findIndex(rank => rank.name === currentRank.name);
             const nextRank = currentIndex < ranks.length - 1 ? ranks[currentIndex + 1] : null;
             const pointsToNext = nextRank ? nextRank.minPoints - points : 0;
@@ -1137,38 +1054,34 @@
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('profile').style.display = 'block';
 
-            const isAdmin = user.email === 'mahmod@gmail.com';
+            isAdmin = user.email === 'mahmod@gmail.com';
             const rankInfo = getRankInfo(user.points || 0, isAdmin);
 
             if (isAdmin) {
-                // Admin view (unchanged)
+                // Admin view
                 document.getElementById('userInfo').innerHTML = `
-                    <p><strong>Display Name:</strong> ${user.displayName || 'Not set'}</p>
-                    <p><strong>Points:</strong> <span id="userPoints">${user.points || 0}</span> 
-                    <button onclick="refreshUserPoints()" style="margin-left: 10px; padding: 2px 8px; font-size: 12px; background: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">🔄 Refresh</button></p>
-
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid ${rankInfo.color}; margin: 10px 0;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                            <div style="display: flex; align-items: center;">
-                                <span style="font-size: 24px; margin-right: 10px;">${rankInfo.icon}</span>
-                                <div>
-                                    <div style="font-size: 18px; font-weight: bold; color: ${rankInfo.color};">${rankInfo.name}</div>
-                                    <div style="font-size: 12px; color: #6c757d;">${rankInfo.nameEn}</div>
-                                </div>
-                            </div>
+                    <div class="profile-card">
+                        <div class="profile-name">
+                            <span>👑</span>
+                            <span>${user.displayName || 'المدير'}</span>
+                        </div>
+                        <div class="points-display">
+                            <span>💰</span>
+                            <span id="userPoints">${user.points || 0} نقطة</span>
+                            <button onclick="refreshUserPoints()" class="refresh-btn">🔄</button>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-size: 18px;">
+                            <span style="font-size: 24px;">${rankInfo.icon}</span>
+                            <span style="color: white; font-weight: bold;">${rankInfo.name}</span>
+                            <span style="color: white; font-size: 14px;">(${rankInfo.nameEn})</span>
                         </div>
                     </div>
                 `;
 
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('allUsersPointsSection').style.display = 'none';
-
-                // Start monitoring point requests
-                startAdminRequestMonitoring();
             } else {
-                // User view (new design)
-                const rankingButton = `<button onclick="showRankingSystem()" class="rank-button">📊 جميع الرتب</button>`;
-
+                // User view
                 document.getElementById('userInfo').innerHTML = `
                     <div class="profile-card">
                         <div class="profile-name">
@@ -1187,28 +1100,12 @@
                         </div>
                     </div>
 
-                    <!-- Point Request Section -->
-                    <div class="points-section">
-                        <div class="points-header">
-                            <h3 class="points-title">🎯 طلب نقاط إضافية</h3>
-                        </div>
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-                            <input type="password" id="requestPinInput" placeholder="الرقم السري" maxlength="4" pattern="\\d{4}" style="padding: 10px; border: 2px solid #28a745; border-radius: 10px; text-align: center; font-size: 16px; width: 120px;">
-                        </div>
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-                            <button onclick="requestPoints(1)" class="point-request-btn">+1 نقطة</button>
-                            <button onclick="requestPoints(2)" class="point-request-btn">+2 نقطة</button>
-                            <button onclick="requestPoints(3)" class="point-request-btn">+3 نقطة</button>
-                        </div>
-                        <div id="requestStatus" style="text-align: center; font-size: 14px; color: #666;"></div>
-                    </div>
-
                     <div class="rank-card">
                         <div class="rank-header">
                             <div style="text-align: center; width: 100%;">
                                 <h3 style="color: #667eea; margin: 0 0 15px 0;">معلومات الرتبة</h3>
                             </div>
-                            ${rankingButton}
+                            <button onclick="showRankingSystem()" class="rank-button">📊 جميع الرتب</button>
                         </div>
 
                         ${rankInfo.nextRank ? `
@@ -1231,32 +1128,45 @@
 
                 document.getElementById('adminPanel').style.display = 'none';
                 document.getElementById('allUsersPointsSection').style.display = 'block';
-
-                // Auto-load leaderboard for regular users
                 loadAllUsersPoints();
             }
+        }
+
+        // Check for saved session
+        function checkSavedSession() {
+            const savedSession = localStorage.getItem('userSession');
+            if (savedSession) {
+                try {
+                    const userData = JSON.parse(savedSession);
+                    currentUser = userData;
+                    showProfile(userData);
+                    return true;
+                } catch (error) {
+                    localStorage.removeItem('userSession');
+                }
+            }
+            return false;
         }
 
         // Auth state observer
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is signed in via Firebase (admin)
                 currentUser = user;
-                localStorage.removeItem('userSession'); // Clear any display name sessions
+                localStorage.removeItem('userSession');
 
-                // Get user data from Firestore
                 try {
                     const userDoc = await getDoc(doc(db, 'users', user.uid));
                     const userData = userDoc.exists() ? userDoc.data() : {};
 
-                    showProfile({
+                    const userInfo = {
                         uid: user.uid,
                         email: user.email,
                         displayName: userData.displayName || '',
                         points: userData.points || 0
-                    });
+                    };
+
+                    showProfile(userInfo);
                 } catch (error) {
-                    console.error('Error getting user data:', error);
                     showProfile({
                         uid: user.uid,
                         email: user.email,
@@ -1265,8 +1175,6 @@
                     });
                 }
             } else {
-                // User is signed out from Firebase
-                // Check if there's a saved display name session
                 if (!checkSavedSession()) {
                     currentUser = null;
                     showLogin();
@@ -1274,19 +1182,18 @@
             }
         });
 
-        // Show admin login form
+        // Show admin/user login forms
         window.showAdminLogin = function() {
             document.getElementById('userLoginForm').style.display = 'none';
             document.getElementById('adminLoginForm').style.display = 'block';
         }
 
-        // Show user login form
         window.showUserLogin = function() {
             document.getElementById('adminLoginForm').style.display = 'none';
             document.getElementById('userLoginForm').style.display = 'block';
         }
 
-        // User login form submission (display name only)
+        // User login (display name only)
         document.getElementById('userLoginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -1298,51 +1205,40 @@
             }
 
             try {
-                const response = await fetch('/user-login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        displayName: displayName
-                    })
-                });
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('displayName', '==', displayName));
+                const querySnapshot = await getDocs(q);
 
-                const data = await response.json();
-
-                if (data.success) {
-                    // Save user session in localStorage
-                    localStorage.setItem('userSession', JSON.stringify({
-                        uid: data.user.uid,
-                        email: data.user.email,
-                        displayName: data.user.displayName,
-                        points: data.user.points,
-                        loginType: 'displayName'
-                    }));
-
-                    // Simulate Firebase auth state for display name login
-                    currentUser = {
-                        uid: data.user.uid,
-                        email: data.user.email
-                    };
-
-                    showProfile({
-                        uid: data.user.uid,
-                        email: data.user.email,
-                        displayName: data.user.displayName,
-                        points: data.user.points
-                    });
-
-                    showMessage('تم تسجيل الدخول بنجاح! 🎉');
-                } else {
-                    showMessage(data.message, 'error');
+                if (querySnapshot.empty) {
+                    showMessage('المستخدم غير موجود.', 'error');
+                    return;
                 }
+
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+
+                if (userData.email === 'mahmod@gmail.com') {
+                    showMessage('المدير يجب أن يسجل دخول بالإيميل وكلمة المرور', 'error');
+                    return;
+                }
+
+                const userInfo = {
+                    uid: userData.uid,
+                    email: userData.email,
+                    displayName: userData.displayName,
+                    points: userData.points || 0
+                };
+
+                localStorage.setItem('userSession', JSON.stringify(userInfo));
+                currentUser = userInfo;
+                showProfile(userInfo);
+                showMessage('تم تسجيل الدخول بنجاح! 🎉');
             } catch (error) {
                 showMessage('خطأ في تسجيل الدخول: ' + error.message, 'error');
             }
         });
 
-        // Admin login form submission (email and password)
+        // Admin login
         document.getElementById('adminLoginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -1357,12 +1253,12 @@
             }
         });
 
-        // Admin create user form submission
+        // Admin create user
         document.getElementById('adminCreateUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
                 return;
             }
 
@@ -1370,264 +1266,230 @@
             const password = document.getElementById('adminUserPassword').value;
             const displayName = document.getElementById('adminUserDisplayName').value.trim();
 
-            if (!email || !password) {
-                showMessage('Email and password are required.', 'error');
-                return;
-            }
-
             try {
-                const response = await fetch('/admin/create-user', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        email: email,
-                        password: password,
-                        displayName: displayName
-                    })
+                // Check if display name exists
+                if (displayName) {
+                    const usersRef = collection(db, 'users');
+                    const q = query(usersRef, where('displayName', '==', displayName));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        showMessage('Display name already exists.', 'error');
+                        return;
+                    }
+                }
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(doc(db, 'users', user.uid), {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: displayName || '',
+                    points: 1,
+                    pin: null,
+                    createdAt: new Date().toISOString()
                 });
 
-                const data = await response.json();
+                showMessage('User created successfully!');
+                document.getElementById('adminCreateUserForm').reset();
 
-                if (data.success) {
-                    showMessage('User created successfully!');
-                    document.getElementById('adminCreateUserForm').reset();
-                    // Refresh user list if it's currently shown
-                    if (document.getElementById('usersList').innerHTML) {
-                        loadAllUsers();
-                    }
-                } else {
-                    showMessage(data.message, 'error');
+                if (document.getElementById('usersList').innerHTML) {
+                    loadAllUsers();
                 }
             } catch (error) {
-                showMessage('Error creating user: ' + error.message, 'error');
+                showMessage('Error: ' + error.message, 'error');
             }
         });
 
-        // Update points by display name form submission
+        // Update points by name
         document.getElementById('updatePointsByNameForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
                 return;
             }
 
             const displayName = document.getElementById('pointsUserDisplayName').value.trim();
-            const points = document.getElementById('newPointsByName').value;
-
-            if (!displayName || points === '') {
-                showMessage('Display name and points are required.', 'error');
-                return;
-            }
+            const points = parseInt(document.getElementById('newPointsByName').value);
 
             try {
-                const response = await fetch('/admin/update-points-by-name', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        displayName: displayName,
-                        points: points
-                    })
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('displayName', '==', displayName));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    showMessage('User not found.', 'error');
+                    return;
+                }
+
+                const userDoc = querySnapshot.docs[0];
+                await updateDoc(doc(db, 'users', userDoc.id), {
+                    points: points,
+                    updatedAt: new Date().toISOString()
                 });
 
-                const data = await response.json();
+                showMessage('Points updated successfully!');
+                document.getElementById('updatePointsByNameForm').reset();
 
-                if (data.success) {
-                    showMessage(`Points updated successfully for ${data.userEmail}!`);
-                    document.getElementById('updatePointsByNameForm').reset();
-                    // Refresh user list if it's currently shown
-                    if (document.getElementById('usersList').innerHTML) {
-                        loadAllUsers();
-                    }
-                    // Refresh current user data if updating current user's points
-                    if (data.userEmail === currentUser.email) {
-                        // Reload user data to show updated points
-                        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                        const userData = userDoc.exists() ? userDoc.data() : {};
-                        showProfile({
-                            uid: currentUser.uid,
-                            email: currentUser.email,
-                            displayName: userData.displayName || '',
-                            points: userData.points || 0
-                        });
-                    }
-                } else {
-                    showMessage(data.message, 'error');
+                if (document.getElementById('usersList').innerHTML) {
+                    loadAllUsers();
                 }
             } catch (error) {
-                showMessage('Error updating points: ' + error.message, 'error');
+                showMessage('Error: ' + error.message, 'error');
             }
         });
 
-        // Update display name form submission (by current display name)
+        // Update display name
         document.getElementById('updateDisplayNameForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
                 return;
             }
 
             const currentDisplayName = document.getElementById('currentDisplayName').value.trim();
             const newDisplayName = document.getElementById('newDisplayName').value.trim();
 
-            if (!currentDisplayName || !newDisplayName) {
-                showMessage('Current and new display names are required.', 'error');
-                return;
-            }
-
             try {
-                const response = await fetch('/admin/update-display-name-by-name', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        currentDisplayName: currentDisplayName,
-                        newDisplayName: newDisplayName
-                    })
+                // Check if new name exists
+                const usersRef = collection(db, 'users');
+                const newNameQuery = query(usersRef, where('displayName', '==', newDisplayName));
+                const newNameSnapshot = await getDocs(newNameQuery);
+
+                if (!newNameSnapshot.empty) {
+                    const existingUser = newNameSnapshot.docs[0].data();
+                    if (existingUser.displayName !== currentDisplayName) {
+                        showMessage('New display name already exists.', 'error');
+                        return;
+                    }
+                }
+
+                // Find current user
+                const currentNameQuery = query(usersRef, where('displayName', '==', currentDisplayName));
+                const currentNameSnapshot = await getDocs(currentNameQuery);
+
+                if (currentNameSnapshot.empty) {
+                    showMessage('User not found.', 'error');
+                    return;
+                }
+
+                const userDoc = currentNameSnapshot.docs[0];
+                await updateDoc(doc(db, 'users', userDoc.id), {
+                    displayName: newDisplayName,
+                    updatedAt: new Date().toISOString()
                 });
 
-                const data = await response.json();
+                showMessage('Display name updated successfully!');
+                document.getElementById('updateDisplayNameForm').reset();
 
-                if (data.success) {
-                    showMessage(`Display name updated from "${data.oldDisplayName}" to "${data.newDisplayName}" for ${data.userEmail}!`);
-                    document.getElementById('updateDisplayNameForm').reset();
-                    // Refresh user list if it's currently shown
-                    if (document.getElementById('usersList').innerHTML) {
-                        loadAllUsers();
-                    }
-                    // Refresh current user data if updating current user's display name
-                    if (data.userEmail === currentUser.email) {
-                        // Reload user data to show updated display name
-                        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                        const userData = userDoc.exists() ? userDoc.data() : {};
-                        showProfile({
-                            uid: currentUser.uid,
-                            email: currentUser.email,
-                            displayName: userData.displayName || '',
-                            points: userData.points || 0
-                        });
-                    }
-                } else {
-                    showMessage(data.message, 'error');
+                if (document.getElementById('usersList').innerHTML) {
+                    loadAllUsers();
                 }
             } catch (error) {
-                showMessage('Error updating display name: ' + error.message, 'error');
+                showMessage('Error: ' + error.message, 'error');
             }
         });
 
-        // Delete user form submission (by display name)
+        // Delete user
         document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
                 return;
             }
 
             const targetDisplayName = document.getElementById('deleteUserDisplayName').value.trim();
 
-            if (!targetDisplayName) {
-                showMessage('Display name to delete is required.', 'error');
-                return;
-            }
-
-            // Confirm deletion
-            if (!confirm(`Are you sure you want to delete user with display name: "${targetDisplayName}"? This action cannot be undone.`)) {
+            if (!confirm(`Delete user "${targetDisplayName}"?`)) {
                 return;
             }
 
             try {
-                const response = await fetch('/admin/delete-user-by-name', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        targetDisplayName: targetDisplayName
-                    })
-                });
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('displayName', '==', targetDisplayName));
+                const querySnapshot = await getDocs(q);
 
-                const data = await response.json();
+                if (querySnapshot.empty) {
+                    showMessage('User not found.', 'error');
+                    return;
+                }
 
-                if (data.success) {
-                    showMessage(`User "${targetDisplayName}" (${data.deletedUser}) deleted successfully!`);
-                    document.getElementById('deleteUserForm').reset();
-                    // Refresh user list if it's currently shown
-                    if (document.getElementById('usersList').innerHTML) {
-                        loadAllUsers();
-                    }
-                } else {
-                    showMessage(data.message, 'error');
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+
+                if (userData.email === 'mahmod@gmail.com') {
+                    showMessage('Cannot delete admin account.', 'error');
+                    return;
+                }
+
+                await deleteDoc(doc(db, 'users', userDoc.id));
+
+                showMessage('User deleted successfully!');
+                document.getElementById('deleteUserForm').reset();
+
+                if (document.getElementById('usersList').innerHTML) {
+                    loadAllUsers();
                 }
             } catch (error) {
-                showMessage('Error deleting user: ' + error.message, 'error');
+                showMessage('Error: ' + error.message, 'error');
             }
         });
 
-        // Load all users (admin only)
+        // Load all users (admin)
         window.loadAllUsers = async function() {
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
                 return;
             }
 
             try {
-                const response = await fetch(`/admin/users?adminEmail=${currentUser.email}`);
-                const data = await response.json();
+                const usersRef = collection(db, 'users');
+                const querySnapshot = await getDocs(usersRef);
 
-                if (data.success) {
-                    const filteredUsers = data.users.filter(user => 
-                        user.email && 
-                        user.email !== 'undefined' && 
-                        user.email !== 'mahmod@gmail.com'
-                    );
+                const users = [];
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.email && userData.email !== 'undefined') {
+                        users.push({
+                            id: doc.id,
+                            ...userData
+                        });
+                    }
+                });
 
-                    const usersList = document.getElementById('usersList');
-                    usersList.innerHTML = `
-                        <h4>All Users (${filteredUsers.length})</h4>
-                        <div style="margin-bottom: 15px;">
-                            <input type="text" id="searchDisplayName" placeholder="Search by display name..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;" oninput="filterUsers()">
-                        </div>
-                        <div id="filteredUsersList">
-                            ${filteredUsers.map(user => `
-                                <div class="user-item" data-display-name="${(user.displayName || '').toLowerCase()}">
-                                    <strong>User:</strong> ${user.displayName || 'No display name'} (${user.email})<br>
-                                    <strong>Points:</strong> 
-                                    <span id="points-${user.uid}">${user.points || 0}</span>
-                                    <input type="number" id="edit-points-${user.uid}" value="${user.points || 0}" min="0" style="display: none; width: 80px; margin-left: 5px;">
-                                    <button onclick="editPoints('${user.uid}', '${user.displayName}')" id="edit-btn-${user.uid}" style="margin-left: 10px; padding: 2px 8px; font-size: 12px;" class="update-button">Edit</button>
-                                    <button onclick="savePoints('${user.uid}', '${user.displayName}')" id="save-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;" class="create-button">Save</button>
-                                    <button onclick="cancelEditPoints('${user.uid}')" id="cancel-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;">Cancel</button>
-                                    
-                                    ${user.email !== 'mahmod@gmail.com' ? `
-                                        <input type="password" id="pin-${user.uid}" placeholder="PIN (4 digits)" maxlength="4" pattern="\\d{4}" style="width: 80px; margin-left: 10px;">
-                                        <button onclick="setUserPinByAdmin('${user.displayName || ''}', '${user.uid}')" class="update-button">Set PIN</button>
-                                    ` : ''}
-                                    
-                                    ${user.email !== currentUser.email ? `<button onclick="deleteUser('${user.displayName || user.email}')" class="delete-button" style="margin-left: 10px;">Delete</button>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                } else {
-                    showMessage(data.message, 'error');
-                }
+                const filteredUsers = users.filter(user => user.email !== 'mahmod@gmail.com');
+
+                const usersList = document.getElementById('usersList');
+                usersList.innerHTML = `
+                    <h4>All Users (${filteredUsers.length})</h4>
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="searchDisplayName" placeholder="Search by display name..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;" oninput="filterUsers()">
+                    </div>
+                    <div id="filteredUsersList">
+                        ${filteredUsers.map(user => `
+                            <div class="user-item" data-display-name="${(user.displayName || '').toLowerCase()}">
+                                <strong>User:</strong> ${user.displayName || 'No display name'} (${user.email})<br>
+                                <strong>Points:</strong> 
+                                <span id="points-${user.uid}">${user.points || 0}</span>
+                                <input type="number" id="edit-points-${user.uid}" value="${user.points || 0}" min="0" style="display: none; width: 80px; margin-left: 5px;">
+                                <button onclick="editPoints('${user.uid}', '${user.displayName}')" id="edit-btn-${user.uid}" style="margin-left: 10px; padding: 2px 8px; font-size: 12px;" class="update-button">Edit</button>
+                                <button onclick="savePoints('${user.uid}', '${user.displayName}')" id="save-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;" class="create-button">Save</button>
+                                <button onclick="cancelEditPoints('${user.uid}')" id="cancel-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;">Cancel</button>
+                                <button onclick="deleteUser('${user.displayName || user.email}')" class="delete-button" style="margin-left: 10px;">Delete</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
             } catch (error) {
                 showMessage('Error loading users: ' + error.message, 'error');
             }
         }
 
-        // Filter users by display name
+        // Filter users
         window.filterUsers = function() {
             const searchTerm = document.getElementById('searchDisplayName').value.toLowerCase();
             const userItems = document.querySelectorAll('#filteredUsersList .user-item');
@@ -1643,7 +1505,6 @@
                 }
             });
 
-            // Update the header count
             const header = document.querySelector('#usersList h4');
             if (header) {
                 const totalUsers = userItems.length;
@@ -1655,45 +1516,7 @@
             }
         }
 
-        // Toggle section function
-        window.toggleSection = function(sectionId) {
-            const content = document.getElementById(sectionId + '-content');
-            const icon = document.getElementById(sectionId + '-icon');
-
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-                icon.textContent = '▶';
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                icon.textContent = '▼';
-            }
-        }
-
-        // Logout function
-        window.logout = async function() {
-            try {
-                // Stop admin monitoring if active
-                stopAdminRequestMonitoring();
-
-                // Check if user is logged in via Firebase (admin) or custom auth (regular user)
-                if (auth.currentUser) {
-                    // Admin logout via Firebase
-                    await signOut(auth);
-                } else {
-                    // Regular user logout (custom auth)
-                    currentUser = null;
-                    localStorage.removeItem('userSession');
-                    showLogin();
-                }
-                showMessage('تم تسجيل الخروج بنجاح! 👋');
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
-        }
-
-        // Edit points inline function
+        // Edit points inline
         window.editPoints = function(userId, displayName) {
             const pointsSpan = document.getElementById(`points-${userId}`);
             const editInput = document.getElementById(`edit-points-${userId}`);
@@ -1709,67 +1532,38 @@
             editInput.focus();
         }
 
-        // Save points inline function
+        // Save points inline
         window.savePoints = async function(userId, displayName) {
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
-                return;
-            }
+            if (!isAdmin) return;
 
             const editInput = document.getElementById(`edit-points-${userId}`);
-            const newPoints = editInput.value;
+            const newPoints = parseInt(editInput.value);
 
             try {
-                const response = await fetch('/admin/update-points-by-name', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        displayName: displayName,
-                        points: newPoints
-                    })
+                await updateDoc(doc(db, 'users', userId), {
+                    points: newPoints,
+                    updatedAt: new Date().toISOString()
                 });
 
-                const data = await response.json();
+                showMessage('Points updated successfully!');
 
-                if (data.success) {
-                    showMessage(`Points updated successfully!`);
+                const pointsSpan = document.getElementById(`points-${userId}`);
+                const editBtn = document.getElementById(`edit-btn-${userId}`);
+                const saveBtn = document.getElementById(`save-btn-${userId}`);
+                const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
 
-                    // Update the display
-                    const pointsSpan = document.getElementById(`points-${userId}`);
-                    const editBtn = document.getElementById(`edit-btn-${userId}`);
-                    const saveBtn = document.getElementById(`save-btn-${userId}`);
-                    const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
-
-                    pointsSpan.textContent = newPoints;
-                    pointsSpan.style.display = 'inline';
-                    editInput.style.display = 'none';
-                    editBtn.style.display = 'inline';
-                    saveBtn.style.display = 'none';
-                    cancelBtn.style.display = 'none';
-
-                    // Refresh current user data if updating current user's points
-                    if (data.userEmail === currentUser.email) {
-                        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                        const userData = userDoc.exists() ? userDoc.data() : {};
-                        showProfile({
-                            uid: currentUser.uid,
-                            email: currentUser.email,
-                            displayName: userData.displayName || '',
-                            points: userData.points || 0
-                        });
-                    }
-                } else {
-                    showMessage(data.message, 'error');
-                }
+                pointsSpan.textContent = newPoints;
+                pointsSpan.style.display = 'inline';
+                editInput.style.display = 'none';
+                editBtn.style.display = 'inline';
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
             } catch (error) {
                 showMessage('Error updating points: ' + error.message, 'error');
             }
         }
 
-        // Cancel edit points function
+        // Cancel edit points
         window.cancelEditPoints = function(userId) {
             const pointsSpan = document.getElementById(`points-${userId}`);
             const editInput = document.getElementById(`edit-points-${userId}`);
@@ -1777,10 +1571,8 @@
             const saveBtn = document.getElementById(`save-btn-${userId}`);
             const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
 
-            // Reset input to original value
             editInput.value = pointsSpan.textContent;
 
-            // Show/hide appropriate elements
             pointsSpan.style.display = 'inline';
             editInput.style.display = 'none';
             editBtn.style.display = 'inline';
@@ -1788,7 +1580,7 @@
             cancelBtn.style.display = 'none';
         }
 
-        // Show ranking system modal
+        // Show ranking system
         window.showRankingSystem = async function() {
             const ranks = [
                 { name: 'مبتدئ', nameEn: 'Beginner', color: '#6c757d', icon: '🥉', minPoints: 0 },
@@ -1801,18 +1593,21 @@
                 { name: 'بطل', nameEn: 'Champion', color: '#dc3545', icon: '👑', minPoints: 1500 }
             ];
 
-            // Fetch all users to show their positions
             let usersData = [];
             try {
-                const response = await fetch(`/admin/users?adminEmail=mahmod@gmail.com`);
-                const data = await response.json();
-                if (data.success) {
-                    usersData = data.users
-                        .filter(user => user.email && user.email !== 'undefined')
-                        .sort((a, b) => (b.points || 0) - (a.points || 0));
-                }
+                const usersRef = collection(db, 'users');
+                const querySnapshot = await getDocs(usersRef);
+
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.email && userData.email !== 'undefined') {
+                        usersData.push(userData);
+                    }
+                });
+
+                usersData.sort((a, b) => (b.points || 0) - (a.points || 0));
             } catch (error) {
-                console.error('Error fetching users for ranking:', error);
+                console.error('Error fetching users:', error);
             }
 
             const modal = document.createElement('div');
@@ -1889,7 +1684,6 @@
 
             document.body.appendChild(modal);
 
-            // Close modal when clicking outside
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     modal.remove();
@@ -1897,67 +1691,62 @@
             });
         }
 
-        // Load all users points (visible to everyone)
+        // Load all users points
         window.loadAllUsersPoints = async function() {
-            if (!currentUser) {
-                showMessage('يرجى تسجيل الدخول أولاً', 'error');
-                return;
-            }
-
             try {
-                const response = await fetch(`/admin/users?adminEmail=mahmod@gmail.com`);
-                const data = await response.json();
+                const usersRef = collection(db, 'users');
+                const querySnapshot = await getDocs(usersRef);
 
-                if (data.success) {
-                    // Filter out users without email and sort by points (highest first)
-                    const validUsers = data.users
-                        .filter(user => user.email && user.email !== 'undefined')
-                        .sort((a, b) => (b.points || 0) - (a.points || 0));
+                const validUsers = [];
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.email && userData.email !== 'undefined') {
+                        validUsers.push(userData);
+                    }
+                });
 
-                    const allUsersPointsList = document.getElementById('allUsersPointsList');
-                    allUsersPointsList.innerHTML = `
-                        <div class="leaderboard">
-                            <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">(${validUsers.length})</h4>
-                            ${validUsers.map((user, index) => {
-                                const isAdmin = user.email === 'mahmod@gmail.com';
-                                const rankInfo = getRankInfo(user.points || 0, isAdmin);
-                                const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
-                                const positionColor = positionColors[index] || '#17a2b8';
+                validUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
 
-                                return `
-                                    <div class="leaderboard-item" style="border-right-color: ${positionColor};">
-                                        <div class="leaderboard-content">
-                                            <div class="user-info">
-                                                <div class="position">
-                                                    ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
-                                                </div>
-                                                <div class="user-details">
-                                                    <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
-                                                    <div class="user-rank">
-                                                        <span style="font-size: 18px;">${rankInfo.icon}</span>
-                                                        <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
-                                                    </div>
-                                                </div>
+                const allUsersPointsList = document.getElementById('allUsersPointsList');
+                allUsersPointsList.innerHTML = `
+                    <div class="leaderboard">
+                        <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">(${validUsers.length})</h4>
+                        ${validUsers.map((user, index) => {
+                            const isAdminUser = user.email === 'mahmod@gmail.com';
+                            const rankInfo = getRankInfo(user.points || 0, isAdminUser);
+                            const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+                            const positionColor = positionColors[index] || '#17a2b8';
+
+                            return `
+                                <div class="leaderboard-item" style="border-right-color: ${positionColor};">
+                                    <div class="leaderboard-content">
+                                        <div class="user-info">
+                                            <div class="position">
+                                                ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
                                             </div>
-                                            <div class="user-points">
-                                                ${user.points || 0} نقطة
+                                            <div class="user-details">
+                                                <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
+                                                <div class="user-rank">
+                                                    <span style="font-size: 18px;">${rankInfo.icon}</span>
+                                                    <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="user-points">
+                                            ${user.points || 0} نقطة
+                                        </div>
                                     </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    `;
-                } else {
-                    showMessage('خطأ في تحميل نقاط المستخدمين', 'error');
-                }
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
             } catch (error) {
                 showMessage('خطأ في تحميل نقاط المستخدمين: ' + error.message, 'error');
-                console.error('Error loading users points:', error);
             }
         }
 
-        // Refresh user points function
+        // Refresh user points
         window.refreshUserPoints = async function() {
             if (!currentUser) {
                 showMessage('لا يوجد مستخدم مسجل', 'error');
@@ -1965,49 +1754,38 @@
             }
 
             try {
-                // Check if user is logged in via display name (custom auth)
                 const savedSession = localStorage.getItem('userSession');
                 if (savedSession) {
                     const sessionData = JSON.parse(savedSession);
-                    if (sessionData.loginType === 'displayName') {
-                        // For display name login, fetch fresh data from server
-                        const response = await fetch('/user-login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                displayName: sessionData.displayName
-                            })
-                        });
 
-                        const data = await response.json();
-                        if (data.success) {
-                            // Update localStorage session with fresh data
-                            sessionData.points = data.user.points;
-                            localStorage.setItem('userSession', JSON.stringify(sessionData));
+                    // Fetch fresh data from Firestore
+                    const usersRef = collection(db, 'users');
+                    const q = query(usersRef, where('displayName', '==', sessionData.displayName));
+                    const querySnapshot = await getDocs(q);
 
-                            // Refresh the entire profile to show updated ranking
-                            showProfile({
-                                uid: data.user.uid,
-                                email: data.user.email,
-                                displayName: data.user.displayName,
-                                points: data.user.points
-                            });
-                            showMessage('تم تحديث النقاط! ✨');
-                        } else {
-                            showMessage('خطأ في تحديث النقاط: ' + data.message, 'error');
-                        }
+                    if (!querySnapshot.empty) {
+                        const userDoc = querySnapshot.docs[0];
+                        const userData = userDoc.data();
+
+                        const updatedUserInfo = {
+                            uid: userData.uid,
+                            email: userData.email,
+                            displayName: userData.displayName,
+                            points: userData.points || 0
+                        };
+
+                        localStorage.setItem('userSession', JSON.stringify(updatedUserInfo));
+                        showProfile(updatedUserInfo);
+                        showMessage('تم تحديث النقاط! ✨');
                         return;
                     }
                 }
 
-                // For Firebase auth (admin), get data from Firestore
+                // For Firebase auth users
                 if (auth.currentUser) {
                     const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
                     const userData = userDoc.exists() ? userDoc.data() : {};
 
-                    // Refresh the entire profile to show updated ranking
                     showProfile({
                         uid: currentUser.uid,
                         email: currentUser.email,
@@ -2018,425 +1796,90 @@
                 }
             } catch (error) {
                 showMessage('خطأ في تحديث النقاط: ' + error.message, 'error');
-                console.error('Error refreshing user points:', error);
             }
         }
 
-        // Admin PIN management function
-        window.setUserPinByAdmin = async function(displayName, userId) {
-            const currentUser = getCurrentUser();
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
-                return;
-            }
+        // Toggle admin sections
+        window.toggleSection = function(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const icon = document.getElementById(sectionId + '-icon');
 
-            const pinInput = document.getElementById(`pin-${userId}`);
-            const pin = pinInput.value.trim();
-
-            if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-                showMessage('PIN must be exactly 4 digits', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch('/admin/update-pin', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        displayName: displayName,
-                        newPin: pin
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(data.message);
-                    pinInput.value = ''; // Clear the input after successful set
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('Error setting PIN: ' + error.message, 'error');
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                icon.textContent = '▶';
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                icon.textContent = '▼';
             }
         }
 
-        // Point request functions
-        window.requestPoints = async function(points) {
-            const savedSession = localStorage.getItem('userSession');
-            if (!savedSession) {
-                showMessage('يرجى تسجيل الدخول أولاً', 'error');
+        // Delete user function
+        window.deleteUser = async function(identifier) {
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
                 return;
             }
 
-            const sessionData = JSON.parse(savedSession);
-            if (sessionData.email === 'mahmod@gmail.com') {
-                showMessage('المدير لا يحتاج لطلب نقاط!', 'error');
-                return;
-            }
-
-            const pin = document.getElementById('requestPinInput').value.trim();
-            if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-                showMessage('يرجى إدخال الرقم السري (4 أرقام)', 'error');
+            if (!confirm(`Delete user "${identifier}"?`)) {
                 return;
             }
 
             try {
-                // Disable all request buttons
-                document.querySelectorAll('.point-request-btn').forEach(btn => {
-                    btn.disabled = true;
-                    btn.textContent = 'جاري الإرسال...';
-                });
+                const usersRef = collection(db, 'users');
+                let q;
 
-                const response = await fetch('/request-points', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userDisplayName: sessionData.displayName,
-                        pointsRequested: points,
-                        pin: pin
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('requestStatus').innerHTML = 
-                        `<span style="color: #28a745;">✅ تم إرسال طلب ${points} نقطة بنجاح!</span>`;
-                    showMessage(`تم إرسال طلب ${points} نقطة للمدير! 🎯`);
-
-                    // Clear PIN input
-                    document.getElementById('requestPinInput').value = '';
-
-                    // Start monitoring for acceptance
-                    startUserNotificationMonitoring(data.requestId, sessionData.displayName);
+                if (identifier.includes('@')) {
+                    q = query(usersRef, where('email', '==', identifier));
                 } else {
-                    document.getElementById('requestStatus').innerHTML = 
-                        `<span style="color: #dc3545;">❌ ${data.message}</span>`;
-                    showMessage(data.message, 'error');
+                    q = query(usersRef, where('displayName', '==', identifier));
+                }
+
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    showMessage('User not found.', 'error');
+                    return;
+                }
+
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+
+                if (userData.email === 'mahmod@gmail.com') {
+                    showMessage('Cannot delete admin account.', 'error');
+                    return;
+                }
+
+                await deleteDoc(doc(db, 'users', userDoc.id));
+
+                showMessage('User deleted successfully!');
+
+                if (document.getElementById('usersList').innerHTML) {
+                    loadAllUsers();
                 }
             } catch (error) {
-                document.getElementById('requestStatus').innerHTML = 
-                    `<span style="color: #dc3545;">❌ خطأ في إرسال الطلب</span>`;
-                showMessage('خطأ في إرسال الطلب: ' + error.message, 'error');
-            } finally {
-                // Re-enable buttons after 3 seconds
-                setTimeout(() => {
-                    document.querySelectorAll('.point-request-btn').forEach((btn, index) => {
-                        btn.disabled = false;
-                        btn.textContent = `+${index + 1} نقطة`;
-                    });
-                }, 3000);
+                showMessage('Error deleting user: ' + error.message, 'error');
             }
         }
 
-        // User notification monitoring
-        let userNotificationInterval;
-
-        function startUserNotificationMonitoring(requestId, userDisplayName) {
-            if (userNotificationInterval) {
-                clearInterval(userNotificationInterval);
-            }
-
-            userNotificationInterval = setInterval(async () => {
-                try {
-                    const response = await fetch(`/check-request-status?requestId=${requestId}&userDisplayName=${userDisplayName}`);
-                    const data = await response.json();
-
-                    if (data.success && data.status !== 'pending') {
-                        clearInterval(userNotificationInterval);
-
-                        if (data.status === 'approved') {
-                            // Show quick notification
-                            showQuickNotification('✅ تم قبول النقطة! تحديث النقاط...', 'success');
-
-                            // Refresh user points after 1 second
-                            setTimeout(() => {
-                                refreshUserPoints();
-                            }, 1000);
-                        } else if (data.status === 'denied') {
-                            showQuickNotification('❌ تم رفض الطلب', 'error');
-                        } else if (data.status === 'warned') {
-                            // Check if this was the second warning with points deducted
-                            fetch(`/check-request-status?requestId=${requestId}&userDisplayName=${userDisplayName}`)
-                                .then(response => response.json())
-                                .then(requestData => {
-                                    if (requestData.success && requestData.pointsDeducted > 0) {
-                                        showBigWarningNotification(`⚠️ تحذير ثاني! تم خصم ${requestData.pointsDeducted} نقاط من رصيدك!`);
-                                        // Refresh points after showing notification
-                                        setTimeout(() => {
-                                            refreshUserPoints();
-                                        }, 1000);
-                                    } else {
-                                        showQuickNotification('⚠️ تم تحذيرك من المدير', 'warning');
-                                    }
-                                })
-                                .catch(() => {
-                                    showQuickNotification('⚠️ تم تحذيرك من المدير', 'warning');
-                                });
-                        } else if (data.status === 'muted') {
-                            showQuickNotification('🔇 تم كتمك لمدة دقيقة', 'warning');
-                        }
-
-                        // Clear request status
-                        document.getElementById('requestStatus').innerHTML = '';
-                    }
-                } catch (error) {
-                    console.error('Error checking request status:', error);
-                }
-            }, 1000); // Check every second
-
-            // Stop monitoring after 5 minutes
-            setTimeout(() => {
-                if (userNotificationInterval) {
-                    clearInterval(userNotificationInterval);
-                }
-            }, 5 * 60 * 1000);
-        }
-
-        function showQuickNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = 'quick-notification';
-
-            const bgColor = type === 'success' ? '#28a745' : 
-                           type === 'error' ? '#dc3545' : 
-                           type === 'warning' ? '#ffc107' : '#667eea';
-
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${bgColor};
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                z-index: 1002;
-                font-weight: bold;
-                font-size: 16px;
-                animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
-            `;
-
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function showBigWarningNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'big-warning-notification';
-
-            notification.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, #dc3545, #c82333);
-                color: white;
-                padding: 30px 40px;
-                border-radius: 20px;
-                box-shadow: 0 15px 40px rgba(220, 53, 69, 0.4);
-                z-index: 1003;
-                font-weight: bold;
-                font-size: 24px;
-                text-align: center;
-                min-width: 300px;
-                animation: bigNotificationIn 0.4s ease;
-                border: 3px solid #ffffff;
-            `;
-
-            notification.innerHTML = `
-                <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
-                <div>${message}</div>
-            `;
-
-            // Add CSS animation keyframes
-            if (!document.querySelector('#bigNotificationStyles')) {
-                const styles = document.createElement('style');
-                styles.id = 'bigNotificationStyles';
-                styles.textContent = `
-                    @keyframes bigNotificationIn {
-                        0% {
-                            opacity: 0;
-                            transform: translate(-50%, -50%) scale(0.5);
-                        }
-                        100% {
-                            opacity: 1;
-                            transform: translate(-50%, -50%) scale(1);
-                        }
-                    }
-                    @keyframes bigNotificationOut {
-                        0% {
-                            opacity: 1;
-                            transform: translate(-50%, -50%) scale(1);
-                        }
-                        100% {
-                            opacity: 0;
-                            transform: translate(-50%, -50%) scale(0.8);
-                        }
-                    }
-                `;
-                document.head.appendChild(styles);
-            }
-
-            document.body.appendChild(notification);
-
-            // Remove after 4 seconds with fade out animation
-            setTimeout(() => {
-                notification.style.animation = 'bigNotificationOut 0.3s ease';
-                setTimeout(() => {
-                    notification.remove();
-                }, 300);
-            }, 4000);
-        }
-
-        // Admin point request management
-        window.loadPointRequests = async function() {
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
-                return;
-            }
-
+        // Logout function
+        window.logout = async function() {
             try {
-                const response = await fetch(`/admin/point-requests?adminEmail=${currentUser.email}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    const requestsList = document.getElementById('pointRequestsList');
-                    const notification = document.getElementById('requestNotification');
-
-                    if (data.requests.length === 0) {
-                        requestsList.innerHTML = '<p style="text-align: center; color: #666;">No pending requests</p>';
-                        notification.style.display = 'none';
-                    } else {
-                        notification.style.display = 'inline';
-                        notification.textContent = data.requests.length;
-
-                        requestsList.innerHTML = `
-                            <h5>Pending Requests (${data.requests.length})</h5>
-                            ${data.requests.map(request => {
-                                const timeAgo = Math.floor((Date.now() - request.timestamp) / 1000);
-                                return `
-                                    <div class="request-item">
-                                        <strong>${request.userDisplayName}</strong> requests <strong>${request.pointsRequested} points</strong>
-                                        <br><small style="color: #666;">${timeAgo < 60 ? timeAgo + 's ago' : Math.floor(timeAgo/60) + 'm ago'}</small>
-                                        <div class="request-actions">
-                                            <button onclick="respondToRequest('${request.id}', 'approve')" class="approve-btn">✅ Approve</button>
-                                            <button onclick="respondToRequest('${request.id}', 'deny')" class="deny-btn">❌ Deny</button>
-                                            <button onclick="respondToRequest('${request.id}', 'warn')" class="warn-btn">⚠️ Warn</button>
-                                            <button onclick="respondToRequest('${request.id}', 'mute')" class="mute-btn">🔇 Mute 1min</button>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        `;
-                    }
+                if (auth.currentUser) {
+                    await signOut(auth);
                 } else {
-                    showMessage(data.message, 'error');
+                    currentUser = null;
+                    localStorage.removeItem('userSession');
+                    showLogin();
                 }
+                showMessage('تم تسجيل الخروج بنجاح! 👋');
             } catch (error) {
-                showMessage('Error loading requests: ' + error.message, 'error');
+                showMessage(error.message, 'error');
             }
         }
 
-        window.respondToRequest = async function(requestId, action) {
-            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
-                showMessage('Access denied. Admin privileges required.', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch('/admin/respond-point-request', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        adminEmail: currentUser.email,
-                        requestId: requestId,
-                        action: action
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(data.message);
-
-                    // Show notification toast
-                    const toast = document.createElement('div');
-                    toast.className = 'notification-toast';
-                    toast.innerHTML = `
-                        <div style="font-weight: bold; margin-bottom: 5px;">Request ${action}d</div>
-                        <div style="font-size: 14px;">${data.message}</div>
-                    `;
-                    document.body.appendChild(toast);
-
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 5000);
-
-                    // Refresh the requests list
-                    loadPointRequests();
-
-                    // Refresh user list if it's shown
-                    if (document.getElementById('usersList').innerHTML) {
-                        loadAllUsers();
-                    }
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                showMessage('Error responding to request: ' + error.message, 'error');
-            }
-        }
-
-        // Auto-refresh requests for admin every 5 seconds
-        let adminRequestInterval;
-
-        function startAdminRequestMonitoring() {
-            if (currentUser && currentUser.email === 'mahmod@gmail.com') {
-                adminRequestInterval = setInterval(() => {
-                    if (document.getElementById('pointRequests-content').classList.contains('expanded')) {
-                        loadPointRequests();
-                    } else {
-                        // Just update notification count
-                        fetch(`/admin/point-requests?adminEmail=${currentUser.email}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    const notification = document.getElementById('requestNotification');
-                                    if (data.requests.length > 0) {
-                                        notification.style.display = 'inline';
-                                        notification.textContent = data.requests.length;
-                                    } else {
-                                        notification.style.display = 'none';
-                                    }
-                                }
-                            })
-                            .catch(error => console.error('Error checking requests:', error));
-                    }
-                }, 5000);
-            }
-        }
-
-        function stopAdminRequestMonitoring() {
-            if (adminRequestInterval) {
-                clearInterval(adminRequestInterval);
-                adminRequestInterval = null;
-            }
-        }
-
-        // Initialize the app
+        // Initialize
         window.addEventListener('load', () => {
             if (!checkSavedSession()) {
                 showLogin();

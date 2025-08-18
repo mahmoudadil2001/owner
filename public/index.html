@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة النقاط الذكية</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 30px 25px;
+        }
+
+        /* User Login Styles */
+        .user-login {
+            text-align: center;
+        }
+
+        .user-login h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 3px solid #e8f0fe;
+            border-radius: 15px;
+            font-size: 18px;
+            background: #f8faff;
+            color: #333;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .user-login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .user-login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .admin-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .admin-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Admin Login Styles (keep original) */
+        #adminLoginForm {
+            display: none;
+        }
+
+        #adminLoginForm input, #adminLoginForm button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        #adminLoginForm button {
+            background: #007cba;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #adminLoginForm button:hover {
+            background: #005a87;
+        }
+
+        /* User Profile Styles */
+        .user-profile {
+            display: none;
+        }
+
+        .profile-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .points-display {
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .rank-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 4px solid #f0f8ff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+            opacity: 0.1;
+        }
+
+        .rank-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .rank-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rank-icon {
+            font-size: 40px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .rank-details h3 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .rank-details p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .rank-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .rank-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .progress-section {
+            margin-top: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #f0f8ff;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .max-rank {
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        .points-section {
+            background: #f8faff;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .points-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .points-title {
+            color: #667eea;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-points-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .view-points-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+        }
+
+        .leaderboard {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-right: 5px solid;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .leaderboard-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .position {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+            min-width: 40px;
+        }
+
+        .user-details h4 {
+            margin: 0;
+            color: #495057;
+            font-size: 16px;
+        }
+
+        .user-rank {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .user-points {
+            text-align: left;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Admin Panel Styles (unchanged) */
+        .admin-panel { 
+            margin-top: 20px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+        }
+
+        .admin-section {
+            background: #f8f9fa;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007cba;
+            overflow: hidden;
+        }
+
+        .admin-section-header {
+            padding: 15px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .admin-section-header:hover {
+            background: #e9ecef;
+        }
+
+        .admin-section-content {
+            padding: 15px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .admin-section-content.expanded {
+            display: block;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(90deg);
+        }
+
+        .admin-subsection {
+            background: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .user-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border-left: 3px solid #007cba;
+        }
+
+        .section-button {
+            background: #17a2b8 !important;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .section-button:hover {
+            background: #138496 !important;
+        }
+
+        .create-button {
+            background: #28a745 !important;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .create-button:hover {
+            background: #218838 !important;
+        }
+
+        .update-button {
+            background: #ffc107 !important;
+            color: #212529 !important;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .update-button:hover {
+            background: #e0a800 !important;
+        }
+
+        .delete-button {
+            background: #dc3545 !important;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background: #c82333 !important;
+        }
+
+        /* Admin form styles */
+        .admin-panel input, .admin-panel button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        .admin-panel h2, .admin-panel h3, .admin-panel h4, .admin-panel h5 {
+            margin: 10px 0;
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .success { 
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
+            color: #155724; 
+            border: 2px solid #b8daff;
+        }
+
+        .error { 
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); 
+            color: #721c24; 
+            border: 2px solid #f5c6cb;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #f8f9fa;
+            padding-bottom: 15px;
+        }
+
+        .modal-title {
+            margin: 0;
+            color: #667eea;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .admin-rank {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid #667eea;
+        }
+
+        .rank-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-right: 5px solid;
+            transition: transform 0.3s ease;
+        }
+
+        .rank-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .rank-item-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rank-item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rank-item-icon {
+            font-size: 24px;
+        }
+
+        .rank-item-details h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .rank-item-details p {
+            margin: 5px 0 0 0;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .rank-item-points {
+            text-align: left;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .modal-tip {
+            margin-top: 25px;
+            padding: 15px;
+            background: #d4edda;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .point-request-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .point-request-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .point-request-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .request-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .request-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .approve-btn {
+            background: #28a745 !important;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .deny-btn {
+            background: #dc3545 !important;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .warn-btn {
+            background: #ffc107 !important;
+            color: #212529;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .mute-btn {
+            background: #6f42c1 !important;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+        </div>
+
+        <div class="content">
+            <div id="message"></div>
+
+            <!-- User Login Form -->
+            <div id="loginForm">
+                <div id="userLoginForm" class="user-login">
+                    <h2>🎯 مرحباً بك</h2>
+                    <form id="userLoginFormElement">
+                        <div class="input-group">
+                            <input type="text" id="userDisplayName" placeholder="اكتب اسمك هنا" required>
+                        </div>
+                        <button type="submit" class="user-login-btn">🚀 دخول</button>
+                    </form>
+                    <a href="#" onclick="showAdminLogin()" class="admin-link">إدارة النظام</a>
+                </div>
+
+                <!-- Admin Login (unchanged) -->
+                <div id="adminLoginForm">
+                    <form id="adminLoginFormElement">
+                        <input type="email" id="adminEmail" placeholder="Email" required>
+                        <input type="password" id="adminPassword" placeholder="Password" required>
+                        <button type="submit">Login</button>
+                    </form>
+                    <p><a href="#" onclick="showUserLogin()">User</a></p>
+                </div>
+            </div>
+
+            <!-- User Profile Section -->
+            <div id="profile" class="user-profile">
+                <div id="userInfo"></div>
+
+                <!-- All Users Points Section (visible only to regular users) -->
+                <div id="allUsersPointsSection" style="display: none;">
+                    <div class="points-section">
+                        <div class="points-header">
+                            <h3 class="points-title">🏆 لوحة المتصدرين</h3>
+                        </div>
+                        <div id="allUsersPointsList"></div>
+                    </div>
+                </div>
+
+                <!-- Admin Panel (unchanged styling) -->
+                <div id="adminPanel" style="display: none;" class="admin-panel">
+                    <h3>🔧 Admin Panel</h3>
+
+                    <!-- Users Overview Section -->
+                    <div class="admin-section">
+                        <div class="admin-section-header" onclick="toggleSection('usersOverview')">
+                            <h4>📊 Users Overview</h4>
+                            <span class="expand-icon" id="usersOverview-icon">▶</span>
+                        </div>
+                        <div class="admin-section-content" id="usersOverview-content">
+                            <button onclick="loadAllUsers()" class="section-button">View All Users</button>
+                            <div id="usersList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Create New User Section -->
+                    <div class="admin-section">
+                        <div class="admin-section-header" onclick="toggleSection('createUser')">
+                            <h4>➕ Create New User</h4>
+                            <span class="expand-icon" id="createUser-icon">▶</span>
+                        </div>
+                        <div class="admin-section-content" id="createUser-content">
+                            <form id="adminCreateUserForm">
+                                <input type="email" id="adminUserEmail" placeholder="User Email" required>
+                                <input type="text" id="adminUserDisplayName" placeholder="Display Name">
+                                <input type="password" id="adminUserPassword" placeholder="Password" required>
+                                <button type="submit" class="create-button">Create User</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    
+
+                    <!-- Point Requests Management -->
+                    <div class="admin-section">
+                        <div class="admin-section-header" onclick="toggleSection('pointRequests')">
+                            <h4>🎯 Point Requests <span id="requestNotification" style="background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; margin-left: 10px; display: none;"></span></h4>
+                            <span class="expand-icon" id="pointRequests-icon">▶</span>
+                        </div>
+                        <div class="admin-section-content" id="pointRequests-content">
+                            <button onclick="loadPointRequests()" class="section-button">🔄 Refresh Requests</button>
+                            <div id="pointRequestsList"></div>
+                        </div>
+                    </div>
+
+                    <!-- User Management Section -->
+                    <div class="admin-section">
+                        <div class="admin-section-header" onclick="toggleSection('userManagement')">
+                            <h4>👤 User Management</h4>
+                            <span class="expand-icon" id="userManagement-icon">▶</span>
+                        </div>
+                        <div class="admin-section-content" id="userManagement-content">
+                            <!-- Update Points -->
+                            <div class="admin-subsection">
+                                <h5>🎯 Update User Points</h5>
+                                <form id="updatePointsByNameForm">
+                                    <input type="text" id="pointsUserDisplayName" placeholder="Display Name" required>
+                                    <input type="number" id="newPointsByName" placeholder="New Points" required min="0">
+                                    <button type="submit" class="update-button">Update Points</button>
+                                </form>
+                            </div>
+
+                            <!-- Update Display Name -->
+                            <div class="admin-subsection">
+                                <h5>✏️ Change Display Name</h5>
+                                <form id="updateDisplayNameForm">
+                                    <input type="text" id="currentDisplayName" placeholder="Current Display Name" required>
+                                    <input type="text" id="newDisplayName" placeholder="New Display Name" required>
+                                    <button type="submit" class="update-button">Update Display Name</button>
+                                </form>
+                            </div>
+
+                            <!-- Delete User -->
+                            <div class="admin-subsection">
+                                <h5>🗑️ Delete User</h5>
+                                <form id="deleteUserForm">
+                                    <input type="text" id="deleteUserDisplayName" placeholder="Display Name to Delete" required>
+                                    <button type="submit" class="delete-button">Delete User</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="logout()" class="logout-btn">🚪 خروج</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5pkNdm8ik_Fd2p13QElfVXWMZjJxqKBk",
+            authDomain: "owner-523c8.firebaseapp.com",
+            projectId: "owner-523c8",
+            storageBucket: "owner-523c8.firebasestorage.app",
+            messagingSenderId: "414224069376",
+            appId: "1:414224069376:web:6030d9f7b6b4a61e3a39e5",
+            measurementId: "G-5VBY5ZM24S"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // Helper function to get current user
+        function getCurrentUser() {
+            return currentUser;
+        }
+
+        // Check for saved session on page load
+        function checkSavedSession() {
+            const savedSession = localStorage.getItem('userSession');
+            if (savedSession) {
+                try {
+                    const userData = JSON.parse(savedSession);
+                    if (userData.loginType === 'displayName') {
+                        currentUser = {
+                            uid: userData.uid,
+                            email: userData.email
+                        };
+                        showProfile(userData);
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error parsing saved session:', error);
+                    localStorage.removeItem('userSession');
+                }
+            }
+            return false;
+        }
+
+        // Show message
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Show login form
+        window.showLogin = function() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('profile').style.display = 'none';
+        }
+
+        // Arabic ranking system
+        function getRankInfo(points, isAdmin = false) {
+            if (isAdmin) {
+                return {
+                    name: 'المدير',
+                    nameEn: 'Admin',
+                    color: '#dc3545',
+                    icon: '👑',
+                    minPoints: 0
+                };
+            }
+
+            const ranks = [
+                { name: 'مبتدئ', nameEn: 'Beginner', color: '#6c757d', icon: '🥉', minPoints: 0 },
+                { name: 'متدرب', nameEn: 'Trainee', color: '#17a2b8', icon: '📚', minPoints: 50 },
+                { name: 'متقدم', nameEn: 'Advanced', color: '#28a745', icon: '⭐', minPoints: 150 },
+                { name: 'خبير', nameEn: 'Expert', color: '#ffc107', icon: '🏆', minPoints: 300 },
+                { name: 'محترف', nameEn: 'Professional', color: '#fd7e14', icon: '💎', minPoints: 500 },
+                { name: 'ماهر', nameEn: 'Master', color: '#e83e8c', icon: '🔥', minPoints: 750 },
+                { name: 'أسطورة', nameEn: 'Legend', color: '#6f42c1', icon: '⚡', minPoints: 1000 },
+                { name: 'بطل', nameEn: 'Champion', color: '#dc3545', icon: '👑', minPoints: 1500 }
+            ];
+
+            // Find the appropriate rank based on points
+            let currentRank = ranks[0]; // Default to first rank
+            for (let i = ranks.length - 1; i >= 0; i--) {
+                if (points >= ranks[i].minPoints) {
+                    currentRank = ranks[i];
+                    break;
+                }
+            }
+
+            // Calculate next rank info
+            const currentIndex = ranks.findIndex(rank => rank.name === currentRank.name);
+            const nextRank = currentIndex < ranks.length - 1 ? ranks[currentIndex + 1] : null;
+            const pointsToNext = nextRank ? nextRank.minPoints - points : 0;
+
+            return {
+                ...currentRank,
+                nextRank,
+                pointsToNext,
+                progress: nextRank ? ((points - currentRank.minPoints) / (nextRank.minPoints - currentRank.minPoints)) * 100 : 100
+            };
+        }
+
+        // Show profile
+        async function showProfile(user) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('profile').style.display = 'block';
+
+            const isAdmin = user.email === 'mahmod@gmail.com';
+            const rankInfo = getRankInfo(user.points || 0, isAdmin);
+
+            if (isAdmin) {
+                // Admin view (unchanged)
+                document.getElementById('userInfo').innerHTML = `
+                    <p><strong>Display Name:</strong> ${user.displayName || 'Not set'}</p>
+                    <p><strong>Points:</strong> <span id="userPoints">${user.points || 0}</span> 
+                    <button onclick="refreshUserPoints()" style="margin-left: 10px; padding: 2px 8px; font-size: 12px; background: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">🔄 Refresh</button></p>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid ${rankInfo.color}; margin: 10px 0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 24px; margin-right: 10px;">${rankInfo.icon}</span>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: bold; color: ${rankInfo.color};">${rankInfo.name}</div>
+                                    <div style="font-size: 12px; color: #6c757d;">${rankInfo.nameEn}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('allUsersPointsSection').style.display = 'none';
+
+                // Start monitoring point requests
+                startAdminRequestMonitoring();
+            } else {
+                // User view (new design)
+                const rankingButton = `<button onclick="showRankingSystem()" class="rank-button">📊 جميع الرتب</button>`;
+
+                document.getElementById('userInfo').innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-name">
+                            <span>👤</span>
+                            <span>${user.displayName || 'لم يتم تعيين الاسم'}</span>
+                        </div>
+                        <div class="points-display">
+                            <span>💰</span>
+                            <span id="userPoints">${user.points || 0} نقطة</span>
+                            <button onclick="refreshUserPoints()" class="refresh-btn">🔄</button>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-size: 18px;">
+                            <span style="font-size: 24px;">${rankInfo.icon}</span>
+                            <span style="color: white; font-weight: bold;">${rankInfo.name}</span>
+                            <span style="color: white; font-size: 14px;">(${rankInfo.nameEn})</span>
+                        </div>
+                    </div>
+
+                    <!-- Point Request Section -->
+                    <div class="points-section">
+                        <div class="points-header">
+                            <h3 class="points-title">🎯 طلب نقاط إضافية</h3>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                            <input type="password" id="requestPinInput" placeholder="الرقم السري" maxlength="4" pattern="\\d{4}" style="padding: 10px; border: 2px solid #28a745; border-radius: 10px; text-align: center; font-size: 16px; width: 120px;">
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+                            <button onclick="requestPoints(1)" class="point-request-btn">+1 نقطة</button>
+                            <button onclick="requestPoints(2)" class="point-request-btn">+2 نقطة</button>
+                            <button onclick="requestPoints(3)" class="point-request-btn">+3 نقطة</button>
+                        </div>
+                        <div id="requestStatus" style="text-align: center; font-size: 14px; color: #666;"></div>
+                    </div>
+
+                    <div class="rank-card">
+                        <div class="rank-header">
+                            <div style="text-align: center; width: 100%;">
+                                <h3 style="color: #667eea; margin: 0 0 15px 0;">معلومات الرتبة</h3>
+                            </div>
+                            ${rankingButton}
+                        </div>
+
+                        ${rankInfo.nextRank ? `
+                            <div class="progress-section">
+                                <div class="progress-info">
+                                    <span>التقدم للرتبة التالية: ${rankInfo.nextRank.name}</span>
+                                    <span>${rankInfo.pointsToNext} نقطة متبقية</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${Math.min(rankInfo.progress, 100)}%; background: linear-gradient(90deg, ${rankInfo.color}, ${rankInfo.nextRank.color});"></div>
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="max-rank">
+                                🎉 تهانينا! لقد وصلت لأعلى رتبة! 🎉
+                            </div>
+                        `}
+                    </div>
+                `;
+
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('allUsersPointsSection').style.display = 'block';
+
+                // Auto-load leaderboard for regular users
+                loadAllUsersPoints();
+            }
+        }
+
+        // Auth state observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in via Firebase (admin)
+                currentUser = user;
+                localStorage.removeItem('userSession'); // Clear any display name sessions
+
+                // Get user data from Firestore
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    const userData = userDoc.exists() ? userDoc.data() : {};
+
+                    showProfile({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: userData.displayName || '',
+                        points: userData.points || 0
+                    });
+                } catch (error) {
+                    console.error('Error getting user data:', error);
+                    showProfile({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: '',
+                        points: 0
+                    });
+                }
+            } else {
+                // User is signed out from Firebase
+                // Check if there's a saved display name session
+                if (!checkSavedSession()) {
+                    currentUser = null;
+                    showLogin();
+                }
+            }
+        });
+
+        // Show admin login form
+        window.showAdminLogin = function() {
+            document.getElementById('userLoginForm').style.display = 'none';
+            document.getElementById('adminLoginForm').style.display = 'block';
+        }
+
+        // Show user login form
+        window.showUserLogin = function() {
+            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('userLoginForm').style.display = 'block';
+        }
+
+        // User login form submission (display name only)
+        document.getElementById('userLoginFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const displayName = document.getElementById('userDisplayName').value.trim();
+
+            if (!displayName) {
+                showMessage('يرجى إدخال اسم عرض.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/user-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        displayName: displayName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Save user session in localStorage
+                    localStorage.setItem('userSession', JSON.stringify({
+                        uid: data.user.uid,
+                        email: data.user.email,
+                        displayName: data.user.displayName,
+                        points: data.user.points,
+                        loginType: 'displayName'
+                    }));
+
+                    // Simulate Firebase auth state for display name login
+                    currentUser = {
+                        uid: data.user.uid,
+                        email: data.user.email
+                    };
+
+                    showProfile({
+                        uid: data.user.uid,
+                        email: data.user.email,
+                        displayName: data.user.displayName,
+                        points: data.user.points
+                    });
+
+                    showMessage('تم تسجيل الدخول بنجاح! 🎉');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('خطأ في تسجيل الدخول: ' + error.message, 'error');
+            }
+        });
+
+        // Admin login form submission (email and password)
+        document.getElementById('adminLoginFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                showMessage('Admin login successful!');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        // Admin create user form submission
+        document.getElementById('adminCreateUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            const email = document.getElementById('adminUserEmail').value;
+            const password = document.getElementById('adminUserPassword').value;
+            const displayName = document.getElementById('adminUserDisplayName').value.trim();
+
+            if (!email || !password) {
+                showMessage('Email and password are required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/create-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        email: email,
+                        password: password,
+                        displayName: displayName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('User created successfully!');
+                    document.getElementById('adminCreateUserForm').reset();
+                    // Refresh user list if it's currently shown
+                    if (document.getElementById('usersList').innerHTML) {
+                        loadAllUsers();
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error creating user: ' + error.message, 'error');
+            }
+        });
+
+        // Update points by display name form submission
+        document.getElementById('updatePointsByNameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            const displayName = document.getElementById('pointsUserDisplayName').value.trim();
+            const points = document.getElementById('newPointsByName').value;
+
+            if (!displayName || points === '') {
+                showMessage('Display name and points are required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/update-points-by-name', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        displayName: displayName,
+                        points: points
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`Points updated successfully for ${data.userEmail}!`);
+                    document.getElementById('updatePointsByNameForm').reset();
+                    // Refresh user list if it's currently shown
+                    if (document.getElementById('usersList').innerHTML) {
+                        loadAllUsers();
+                    }
+                    // Refresh current user data if updating current user's points
+                    if (data.userEmail === currentUser.email) {
+                        // Reload user data to show updated points
+                        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                        const userData = userDoc.exists() ? userDoc.data() : {};
+                        showProfile({
+                            uid: currentUser.uid,
+                            email: currentUser.email,
+                            displayName: userData.displayName || '',
+                            points: userData.points || 0
+                        });
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error updating points: ' + error.message, 'error');
+            }
+        });
+
+        // Update display name form submission (by current display name)
+        document.getElementById('updateDisplayNameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            const currentDisplayName = document.getElementById('currentDisplayName').value.trim();
+            const newDisplayName = document.getElementById('newDisplayName').value.trim();
+
+            if (!currentDisplayName || !newDisplayName) {
+                showMessage('Current and new display names are required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/update-display-name-by-name', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        currentDisplayName: currentDisplayName,
+                        newDisplayName: newDisplayName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`Display name updated from "${data.oldDisplayName}" to "${data.newDisplayName}" for ${data.userEmail}!`);
+                    document.getElementById('updateDisplayNameForm').reset();
+                    // Refresh user list if it's currently shown
+                    if (document.getElementById('usersList').innerHTML) {
+                        loadAllUsers();
+                    }
+                    // Refresh current user data if updating current user's display name
+                    if (data.userEmail === currentUser.email) {
+                        // Reload user data to show updated display name
+                        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                        const userData = userDoc.exists() ? userDoc.data() : {};
+                        showProfile({
+                            uid: currentUser.uid,
+                            email: currentUser.email,
+                            displayName: userData.displayName || '',
+                            points: userData.points || 0
+                        });
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error updating display name: ' + error.message, 'error');
+            }
+        });
+
+        // Delete user form submission (by display name)
+        document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            const targetDisplayName = document.getElementById('deleteUserDisplayName').value.trim();
+
+            if (!targetDisplayName) {
+                showMessage('Display name to delete is required.', 'error');
+                return;
+            }
+
+            // Confirm deletion
+            if (!confirm(`Are you sure you want to delete user with display name: "${targetDisplayName}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/delete-user-by-name', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        targetDisplayName: targetDisplayName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`User "${targetDisplayName}" (${data.deletedUser}) deleted successfully!`);
+                    document.getElementById('deleteUserForm').reset();
+                    // Refresh user list if it's currently shown
+                    if (document.getElementById('usersList').innerHTML) {
+                        loadAllUsers();
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting user: ' + error.message, 'error');
+            }
+        });
+
+        // Load all users (admin only)
+        window.loadAllUsers = async function() {
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/users?adminEmail=${currentUser.email}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const filteredUsers = data.users.filter(user => 
+                        user.email && 
+                        user.email !== 'undefined' && 
+                        user.email !== 'mahmod@gmail.com'
+                    );
+
+                    const usersList = document.getElementById('usersList');
+                    usersList.innerHTML = `
+                        <h4>All Users (${filteredUsers.length})</h4>
+                        <div style="margin-bottom: 15px;">
+                            <input type="text" id="searchDisplayName" placeholder="Search by display name..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;" oninput="filterUsers()">
+                        </div>
+                        <div id="filteredUsersList">
+                            ${filteredUsers.map(user => `
+                                <div class="user-item" data-display-name="${(user.displayName || '').toLowerCase()}">
+                                    <strong>User:</strong> ${user.displayName || 'No display name'} (${user.email})<br>
+                                    <strong>Points:</strong> 
+                                    <span id="points-${user.uid}">${user.points || 0}</span>
+                                    <input type="number" id="edit-points-${user.uid}" value="${user.points || 0}" min="0" style="display: none; width: 80px; margin-left: 5px;">
+                                    <button onclick="editPoints('${user.uid}', '${user.displayName}')" id="edit-btn-${user.uid}" style="margin-left: 10px; padding: 2px 8px; font-size: 12px;" class="update-button">Edit</button>
+                                    <button onclick="savePoints('${user.uid}', '${user.displayName}')" id="save-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;" class="create-button">Save</button>
+                                    <button onclick="cancelEditPoints('${user.uid}')" id="cancel-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;">Cancel</button>
+                                    
+                                    ${user.email !== 'mahmod@gmail.com' ? `
+                                        <input type="password" id="pin-${user.uid}" placeholder="PIN (4 digits)" maxlength="4" pattern="\\d{4}" style="width: 80px; margin-left: 10px;">
+                                        <button onclick="setUserPinByAdmin('${user.displayName || ''}', '${user.uid}')" class="update-button">Set PIN</button>
+                                    ` : ''}
+                                    
+                                    ${user.email !== currentUser.email ? `<button onclick="deleteUser('${user.displayName || user.email}')" class="delete-button" style="margin-left: 10px;">Delete</button>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading users: ' + error.message, 'error');
+            }
+        }
+
+        // Filter users by display name
+        window.filterUsers = function() {
+            const searchTerm = document.getElementById('searchDisplayName').value.toLowerCase();
+            const userItems = document.querySelectorAll('#filteredUsersList .user-item');
+            let visibleCount = 0;
+
+            userItems.forEach(item => {
+                const displayName = item.getAttribute('data-display-name');
+                if (displayName.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Update the header count
+            const header = document.querySelector('#usersList h4');
+            if (header) {
+                const totalUsers = userItems.length;
+                if (searchTerm) {
+                    header.textContent = `All Users (${visibleCount}/${totalUsers})`;
+                } else {
+                    header.textContent = `All Users (${totalUsers})`;
+                }
+            }
+        }
+
+        // Toggle section function
+        window.toggleSection = function(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const icon = document.getElementById(sectionId + '-icon');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+                icon.textContent = '▶';
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                icon.textContent = '▼';
+            }
+        }
+
+        // Logout function
+        window.logout = async function() {
+            try {
+                // Stop admin monitoring if active
+                stopAdminRequestMonitoring();
+
+                // Check if user is logged in via Firebase (admin) or custom auth (regular user)
+                if (auth.currentUser) {
+                    // Admin logout via Firebase
+                    await signOut(auth);
+                } else {
+                    // Regular user logout (custom auth)
+                    currentUser = null;
+                    localStorage.removeItem('userSession');
+                    showLogin();
+                }
+                showMessage('تم تسجيل الخروج بنجاح! 👋');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        // Edit points inline function
+        window.editPoints = function(userId, displayName) {
+            const pointsSpan = document.getElementById(`points-${userId}`);
+            const editInput = document.getElementById(`edit-points-${userId}`);
+            const editBtn = document.getElementById(`edit-btn-${userId}`);
+            const saveBtn = document.getElementById(`save-btn-${userId}`);
+            const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
+
+            pointsSpan.style.display = 'none';
+            editInput.style.display = 'inline';
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline';
+            cancelBtn.style.display = 'inline';
+            editInput.focus();
+        }
+
+        // Save points inline function
+        window.savePoints = async function(userId, displayName) {
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            const editInput = document.getElementById(`edit-points-${userId}`);
+            const newPoints = editInput.value;
+
+            try {
+                const response = await fetch('/admin/update-points-by-name', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        displayName: displayName,
+                        points: newPoints
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(`Points updated successfully!`);
+
+                    // Update the display
+                    const pointsSpan = document.getElementById(`points-${userId}`);
+                    const editBtn = document.getElementById(`edit-btn-${userId}`);
+                    const saveBtn = document.getElementById(`save-btn-${userId}`);
+                    const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
+
+                    pointsSpan.textContent = newPoints;
+                    pointsSpan.style.display = 'inline';
+                    editInput.style.display = 'none';
+                    editBtn.style.display = 'inline';
+                    saveBtn.style.display = 'none';
+                    cancelBtn.style.display = 'none';
+
+                    // Refresh current user data if updating current user's points
+                    if (data.userEmail === currentUser.email) {
+                        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                        const userData = userDoc.exists() ? userDoc.data() : {};
+                        showProfile({
+                            uid: currentUser.uid,
+                            email: currentUser.email,
+                            displayName: userData.displayName || '',
+                            points: userData.points || 0
+                        });
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error updating points: ' + error.message, 'error');
+            }
+        }
+
+        // Cancel edit points function
+        window.cancelEditPoints = function(userId) {
+            const pointsSpan = document.getElementById(`points-${userId}`);
+            const editInput = document.getElementById(`edit-points-${userId}`);
+            const editBtn = document.getElementById(`edit-btn-${userId}`);
+            const saveBtn = document.getElementById(`save-btn-${userId}`);
+            const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
+
+            // Reset input to original value
+            editInput.value = pointsSpan.textContent;
+
+            // Show/hide appropriate elements
+            pointsSpan.style.display = 'inline';
+            editInput.style.display = 'none';
+            editBtn.style.display = 'inline';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        }
+
+        // Show ranking system modal
+        window.showRankingSystem = async function() {
+            const ranks = [
+                { name: 'مبتدئ', nameEn: 'Beginner', color: '#6c757d', icon: '🥉', minPoints: 0 },
+                { name: 'متدرب', nameEn: 'Trainee', color: '#17a2b8', icon: '📚', minPoints: 50 },
+                { name: 'متقدم', nameEn: 'Advanced', color: '#28a745', icon: '⭐', minPoints: 150 },
+                { name: 'خبير', nameEn: 'Expert', color: '#ffc107', icon: '🏆', minPoints: 300 },
+                { name: 'محترف', nameEn: 'Professional', color: '#fd7e14', icon: '💎', minPoints: 500 },
+                { name: 'ماهر', nameEn: 'Master', color: '#e83e8c', icon: '🔥', minPoints: 750 },
+                { name: 'أسطورة', nameEn: 'Legend', color: '#6f42c1', icon: '⚡', minPoints: 1000 },
+                { name: 'بطل', nameEn: 'Champion', color: '#dc3545', icon: '👑', minPoints: 1500 }
+            ];
+
+            // Fetch all users to show their positions
+            let usersData = [];
+            try {
+                const response = await fetch(`/admin/users?adminEmail=mahmod@gmail.com`);
+                const data = await response.json();
+                if (data.success) {
+                    usersData = data.users
+                        .filter(user => user.email && user.email !== 'undefined')
+                        .sort((a, b) => (b.points || 0) - (a.points || 0));
+                }
+            } catch (error) {
+                console.error('Error fetching users for ranking:', error);
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+
+            modal.innerHTML = `
+                <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">🏆 نظام الرتب</h3>
+                        <button onclick="this.closest('.modal').remove()" class="close-btn">×</button>
+                    </div>
+
+                    <div class="admin-rank">
+                        <div style="font-size: 32px; margin-bottom: 10px;">👑</div>
+                        <div style="font-weight: bold; color: #dc3545; font-size: 20px;">المدير</div>
+                        <div style="font-size: 14px; color: #6c757d;">Admin - رتبة خاصة</div>
+                        ${usersData.filter(user => user.email === 'mahmod@gmail.com').map(admin => `
+                            <div style="margin-top: 10px; padding: 8px; background: rgba(220, 53, 69, 0.1); border-radius: 8px;">
+                                <div style="font-weight: bold; color: #dc3545;">${admin.displayName || 'المدير'}</div>
+                                <div style="font-size: 12px; color: #666;">${admin.points || 0} نقطة</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${ranks.map((rank, index) => {
+                        const nextRank = ranks[index + 1];
+                        const playersInRank = usersData.filter(user => {
+                            if (user.email === 'mahmod@gmail.com') return false;
+                            const userPoints = user.points || 0;
+                            const minPoints = rank.minPoints;
+                            const maxPoints = nextRank ? nextRank.minPoints - 1 : Infinity;
+                            return userPoints >= minPoints && userPoints <= maxPoints;
+                        });
+
+                        return `
+                            <div class="rank-item" style="border-right-color: ${rank.color};">
+                                <div class="rank-item-content">
+                                    <div class="rank-item-info">
+                                        <span class="rank-item-icon">${rank.icon}</span>
+                                        <div class="rank-item-details">
+                                            <h4 style="color: ${rank.color};">${rank.name}</h4>
+                                            <p>${rank.nameEn}</p>
+                                        </div>
+                                    </div>
+                                    <div class="rank-item-points">
+                                        ${rank.minPoints}${nextRank ? ` - ${nextRank.minPoints - 1}` : '+'} نقطة
+                                        ${playersInRank.length > 0 ? `<br><span style="font-size: 12px; color: #666;">(${playersInRank.length} لاعب)</span>` : ''}
+                                    </div>
+                                </div>
+                                ${playersInRank.length > 0 ? `
+                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                                        ${playersInRank.map((player, playerIndex) => {
+                                            const globalPosition = usersData.findIndex(u => u.uid === player.uid) + 1;
+                                            return `
+                                                <div style="margin: 5px 0; padding: 5px 8px; background: rgba(${rank.color.replace('#', '')}, 0.1); border-radius: 6px; font-size: 13px;">
+                                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                        <span style="font-weight: bold; color: ${rank.color};">#${globalPosition} ${player.displayName || 'لم يتم تعيين الاسم'}</span>
+                                                        <span style="color: #666;">${player.points || 0} نقطة</span>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+
+                    <div class="modal-tip">
+                        💡 اكسب نقاط أكثر للوصول إلى رتب أعلى!
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // Load all users points (visible to everyone)
+        window.loadAllUsersPoints = async function() {
+            if (!currentUser) {
+                showMessage('يرجى تسجيل الدخول أولاً', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/users?adminEmail=mahmod@gmail.com`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Filter out users without email and sort by points (highest first)
+                    const validUsers = data.users
+                        .filter(user => user.email && user.email !== 'undefined')
+                        .sort((a, b) => (b.points || 0) - (a.points || 0));
+
+                    const allUsersPointsList = document.getElementById('allUsersPointsList');
+                    allUsersPointsList.innerHTML = `
+                        <div class="leaderboard">
+                            <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">(${validUsers.length})</h4>
+                            ${validUsers.map((user, index) => {
+                                const isAdmin = user.email === 'mahmod@gmail.com';
+                                const rankInfo = getRankInfo(user.points || 0, isAdmin);
+                                const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+                                const positionColor = positionColors[index] || '#17a2b8';
+
+                                return `
+                                    <div class="leaderboard-item" style="border-right-color: ${positionColor};">
+                                        <div class="leaderboard-content">
+                                            <div class="user-info">
+                                                <div class="position">
+                                                    ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
+                                                </div>
+                                                <div class="user-details">
+                                                    <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
+                                                    <div class="user-rank">
+                                                        <span style="font-size: 18px;">${rankInfo.icon}</span>
+                                                        <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="user-points">
+                                                ${user.points || 0} نقطة
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                } else {
+                    showMessage('خطأ في تحميل نقاط المستخدمين', 'error');
+                }
+            } catch (error) {
+                showMessage('خطأ في تحميل نقاط المستخدمين: ' + error.message, 'error');
+                console.error('Error loading users points:', error);
+            }
+        }
+
+        // Refresh user points function
+        window.refreshUserPoints = async function() {
+            if (!currentUser) {
+                showMessage('لا يوجد مستخدم مسجل', 'error');
+                return;
+            }
+
+            try {
+                // Check if user is logged in via display name (custom auth)
+                const savedSession = localStorage.getItem('userSession');
+                if (savedSession) {
+                    const sessionData = JSON.parse(savedSession);
+                    if (sessionData.loginType === 'displayName') {
+                        // For display name login, fetch fresh data from server
+                        const response = await fetch('/user-login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                displayName: sessionData.displayName
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            // Update localStorage session with fresh data
+                            sessionData.points = data.user.points;
+                            localStorage.setItem('userSession', JSON.stringify(sessionData));
+
+                            // Refresh the entire profile to show updated ranking
+                            showProfile({
+                                uid: data.user.uid,
+                                email: data.user.email,
+                                displayName: data.user.displayName,
+                                points: data.user.points
+                            });
+                            showMessage('تم تحديث النقاط! ✨');
+                        } else {
+                            showMessage('خطأ في تحديث النقاط: ' + data.message, 'error');
+                        }
+                        return;
+                    }
+                }
+
+                // For Firebase auth (admin), get data from Firestore
+                if (auth.currentUser) {
+                    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                    const userData = userDoc.exists() ? userDoc.data() : {};
+
+                    // Refresh the entire profile to show updated ranking
+                    showProfile({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        displayName: userData.displayName || '',
+                        points: userData.points || 0
+                    });
+                    showMessage('Points refreshed!');
+                }
+            } catch (error) {
+                showMessage('خطأ في تحديث النقاط: ' + error.message, 'error');
+                console.error('Error refreshing user points:', error);
+            }
+        }
+
+        // Admin PIN management function
+        window.setUserPinByAdmin = async function(displayName, userId) {
+            const currentUser = getCurrentUser();
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            const pinInput = document.getElementById(`pin-${userId}`);
+            const pin = pinInput.value.trim();
+
+            if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+                showMessage('PIN must be exactly 4 digits', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/update-pin', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        displayName: displayName,
+                        newPin: pin
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(data.message);
+                    pinInput.value = ''; // Clear the input after successful set
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error setting PIN: ' + error.message, 'error');
+            }
+        }
+
+        // Point request functions
+        window.requestPoints = async function(points) {
+            const savedSession = localStorage.getItem('userSession');
+            if (!savedSession) {
+                showMessage('يرجى تسجيل الدخول أولاً', 'error');
+                return;
+            }
+
+            const sessionData = JSON.parse(savedSession);
+            if (sessionData.email === 'mahmod@gmail.com') {
+                showMessage('المدير لا يحتاج لطلب نقاط!', 'error');
+                return;
+            }
+
+            const pin = document.getElementById('requestPinInput').value.trim();
+            if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+                showMessage('يرجى إدخال الرقم السري (4 أرقام)', 'error');
+                return;
+            }
+
+            try {
+                // Disable all request buttons
+                document.querySelectorAll('.point-request-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.textContent = 'جاري الإرسال...';
+                });
+
+                const response = await fetch('/request-points', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userDisplayName: sessionData.displayName,
+                        pointsRequested: points,
+                        pin: pin
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('requestStatus').innerHTML = 
+                        `<span style="color: #28a745;">✅ تم إرسال طلب ${points} نقطة بنجاح!</span>`;
+                    showMessage(`تم إرسال طلب ${points} نقطة للمدير! 🎯`);
+
+                    // Clear PIN input
+                    document.getElementById('requestPinInput').value = '';
+
+                    // Start monitoring for acceptance
+                    startUserNotificationMonitoring(data.requestId, sessionData.displayName);
+                } else {
+                    document.getElementById('requestStatus').innerHTML = 
+                        `<span style="color: #dc3545;">❌ ${data.message}</span>`;
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                document.getElementById('requestStatus').innerHTML = 
+                    `<span style="color: #dc3545;">❌ خطأ في إرسال الطلب</span>`;
+                showMessage('خطأ في إرسال الطلب: ' + error.message, 'error');
+            } finally {
+                // Re-enable buttons after 3 seconds
+                setTimeout(() => {
+                    document.querySelectorAll('.point-request-btn').forEach((btn, index) => {
+                        btn.disabled = false;
+                        btn.textContent = `+${index + 1} نقطة`;
+                    });
+                }, 3000);
+            }
+        }
+
+        // User notification monitoring
+        let userNotificationInterval;
+
+        function startUserNotificationMonitoring(requestId, userDisplayName) {
+            if (userNotificationInterval) {
+                clearInterval(userNotificationInterval);
+            }
+
+            userNotificationInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/check-request-status?requestId=${requestId}&userDisplayName=${userDisplayName}`);
+                    const data = await response.json();
+
+                    if (data.success && data.status !== 'pending') {
+                        clearInterval(userNotificationInterval);
+
+                        if (data.status === 'approved') {
+                            // Show quick notification
+                            showQuickNotification('✅ تم قبول النقطة! تحديث النقاط...', 'success');
+
+                            // Refresh user points after 1 second
+                            setTimeout(() => {
+                                refreshUserPoints();
+                            }, 1000);
+                        } else if (data.status === 'denied') {
+                            showQuickNotification('❌ تم رفض الطلب', 'error');
+                        } else if (data.status === 'warned') {
+                            // Check if this was the second warning with points deducted
+                            fetch(`/check-request-status?requestId=${requestId}&userDisplayName=${userDisplayName}`)
+                                .then(response => response.json())
+                                .then(requestData => {
+                                    if (requestData.success && requestData.pointsDeducted > 0) {
+                                        showBigWarningNotification(`⚠️ تحذير ثاني! تم خصم ${requestData.pointsDeducted} نقاط من رصيدك!`);
+                                        // Refresh points after showing notification
+                                        setTimeout(() => {
+                                            refreshUserPoints();
+                                        }, 1000);
+                                    } else {
+                                        showQuickNotification('⚠️ تم تحذيرك من المدير', 'warning');
+                                    }
+                                })
+                                .catch(() => {
+                                    showQuickNotification('⚠️ تم تحذيرك من المدير', 'warning');
+                                });
+                        } else if (data.status === 'muted') {
+                            showQuickNotification('🔇 تم كتمك لمدة دقيقة', 'warning');
+                        }
+
+                        // Clear request status
+                        document.getElementById('requestStatus').innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error checking request status:', error);
+                }
+            }, 1000); // Check every second
+
+            // Stop monitoring after 5 minutes
+            setTimeout(() => {
+                if (userNotificationInterval) {
+                    clearInterval(userNotificationInterval);
+                }
+            }, 5 * 60 * 1000);
+        }
+
+        function showQuickNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'quick-notification';
+
+            const bgColor = type === 'success' ? '#28a745' : 
+                           type === 'error' ? '#dc3545' : 
+                           type === 'warning' ? '#ffc107' : '#667eea';
+
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${bgColor};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 1002;
+                font-weight: bold;
+                font-size: 16px;
+                animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+            `;
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function showBigWarningNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'big-warning-notification';
+
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                padding: 30px 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 40px rgba(220, 53, 69, 0.4);
+                z-index: 1003;
+                font-weight: bold;
+                font-size: 24px;
+                text-align: center;
+                min-width: 300px;
+                animation: bigNotificationIn 0.4s ease;
+                border: 3px solid #ffffff;
+            `;
+
+            notification.innerHTML = `
+                <div style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
+                <div>${message}</div>
+            `;
+
+            // Add CSS animation keyframes
+            if (!document.querySelector('#bigNotificationStyles')) {
+                const styles = document.createElement('style');
+                styles.id = 'bigNotificationStyles';
+                styles.textContent = `
+                    @keyframes bigNotificationIn {
+                        0% {
+                            opacity: 0;
+                            transform: translate(-50%, -50%) scale(0.5);
+                        }
+                        100% {
+                            opacity: 1;
+                            transform: translate(-50%, -50%) scale(1);
+                        }
+                    }
+                    @keyframes bigNotificationOut {
+                        0% {
+                            opacity: 1;
+                            transform: translate(-50%, -50%) scale(1);
+                        }
+                        100% {
+                            opacity: 0;
+                            transform: translate(-50%, -50%) scale(0.8);
+                        }
+                    }
+                `;
+                document.head.appendChild(styles);
+            }
+
+            document.body.appendChild(notification);
+
+            // Remove after 4 seconds with fade out animation
+            setTimeout(() => {
+                notification.style.animation = 'bigNotificationOut 0.3s ease';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Admin point request management
+        window.loadPointRequests = async function() {
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/point-requests?adminEmail=${currentUser.email}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const requestsList = document.getElementById('pointRequestsList');
+                    const notification = document.getElementById('requestNotification');
+
+                    if (data.requests.length === 0) {
+                        requestsList.innerHTML = '<p style="text-align: center; color: #666;">No pending requests</p>';
+                        notification.style.display = 'none';
+                    } else {
+                        notification.style.display = 'inline';
+                        notification.textContent = data.requests.length;
+
+                        requestsList.innerHTML = `
+                            <h5>Pending Requests (${data.requests.length})</h5>
+                            ${data.requests.map(request => {
+                                const timeAgo = Math.floor((Date.now() - request.timestamp) / 1000);
+                                return `
+                                    <div class="request-item">
+                                        <strong>${request.userDisplayName}</strong> requests <strong>${request.pointsRequested} points</strong>
+                                        <br><small style="color: #666;">${timeAgo < 60 ? timeAgo + 's ago' : Math.floor(timeAgo/60) + 'm ago'}</small>
+                                        <div class="request-actions">
+                                            <button onclick="respondToRequest('${request.id}', 'approve')" class="approve-btn">✅ Approve</button>
+                                            <button onclick="respondToRequest('${request.id}', 'deny')" class="deny-btn">❌ Deny</button>
+                                            <button onclick="respondToRequest('${request.id}', 'warn')" class="warn-btn">⚠️ Warn</button>
+                                            <button onclick="respondToRequest('${request.id}', 'mute')" class="mute-btn">🔇 Mute 1min</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        `;
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading requests: ' + error.message, 'error');
+            }
+        }
+
+        window.respondToRequest = async function(requestId, action) {
+            if (!currentUser || currentUser.email !== 'mahmod@gmail.com') {
+                showMessage('Access denied. Admin privileges required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/respond-point-request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        adminEmail: currentUser.email,
+                        requestId: requestId,
+                        action: action
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(data.message);
+
+                    // Show notification toast
+                    const toast = document.createElement('div');
+                    toast.className = 'notification-toast';
+                    toast.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 5px;">Request ${action}d</div>
+                        <div style="font-size: 14px;">${data.message}</div>
+                    `;
+                    document.body.appendChild(toast);
+
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 5000);
+
+                    // Refresh the requests list
+                    loadPointRequests();
+
+                    // Refresh user list if it's shown
+                    if (document.getElementById('usersList').innerHTML) {
+                        loadAllUsers();
+                    }
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error responding to request: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-refresh requests for admin every 5 seconds
+        let adminRequestInterval;
+
+        function startAdminRequestMonitoring() {
+            if (currentUser && currentUser.email === 'mahmod@gmail.com') {
+                adminRequestInterval = setInterval(() => {
+                    if (document.getElementById('pointRequests-content').classList.contains('expanded')) {
+                        loadPointRequests();
+                    } else {
+                        // Just update notification count
+                        fetch(`/admin/point-requests?adminEmail=${currentUser.email}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const notification = document.getElementById('requestNotification');
+                                    if (data.requests.length > 0) {
+                                        notification.style.display = 'inline';
+                                        notification.textContent = data.requests.length;
+                                    } else {
+                                        notification.style.display = 'none';
+                                    }
+                                }
+                            })
+                            .catch(error => console.error('Error checking requests:', error));
+                    }
+                }, 5000);
+            }
+        }
+
+        function stopAdminRequestMonitoring() {
+            if (adminRequestInterval) {
+                clearInterval(adminRequestInterval);
+                adminRequestInterval = null;
+            }
+        }
+
+        // Initialize the app
+        window.addEventListener('load', () => {
+            if (!checkSavedSession()) {
+                showLogin();
+            }
+        });
+    </script>
+</body>
+</html>

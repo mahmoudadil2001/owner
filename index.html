@@ -1,1110 +1,876 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام النقاط والترتيب</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 700px;
-            margin-top: 20px;
-        }
-        h1 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        .user-info {
-            background-color: #eef2f7;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .user-info h2 {
-            margin: 0;
-            color: #4a5568;
-        }
-        .user-points {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .leaderboard-btn, .admin-btn, .logout-btn, .action-btn {
-            background-color: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin: 5px;
-            display: inline-block;
-        }
-        .leaderboard-btn:hover, .admin-btn:hover, .logout-btn:hover, .action-btn:hover {
-            background-color: #5a67d8;
-            transform: translateY(-2px);
-        }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 500px;
-            text-align: right;
-            position: relative;
-        }
-        .modal-content h3 {
-            color: #667eea;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .modal-content .close-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 24px;
-            color: #aaa;
-            cursor: pointer;
-        }
-        .modal-content .close-btn:hover {
-            color: #333;
-        }
-        .leaderboard {
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            text-align: right;
-        }
-        .leaderboard-item {
-            background: #f8f9fa;
-            border-left: 5px solid #667eea;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .leaderboard-item:hover {
-            transform: translateX(-5px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .leaderboard-content {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-        .user-info .position {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #667eea;
-            margin-left: 15px;
-            min-width: 50px;
-            text-align: center;
-        }
-        .user-details h4 {
-            margin: 0 0 5px 0;
-            color: #4a5568;
-        }
-        .user-rank {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .user-points {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #38a169;
-        }
-        .modal-tip {
-            margin-top: 25px;
-            font-size: 14px;
-            color: #555;
-            text-align: center;
-            padding: 10px;
-            background: rgba(102, 122, 234, 0.1);
-            border-radius: 5px;
-        }
-        .login-form, .register-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .login-form input, .register-form input, #newPin, #requestedPoints {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .login-form button, .register-form button {
-            background-color: #38a169;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .login-form button:hover, .register-form button:hover {
-            background-color: #2f855a;
-        }
-        .message {
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .admin-section {
-            margin-top: 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-        }
-        .section-header {
-            background-color: #edf2f7;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-header h4 {
-            margin: 0;
-            color: #4a5568;
-            font-size: 1.1em;
-        }
-        .section-icon {
-            font-size: 14px;
-            transition: transform 0.3s ease;
-        }
-        .section-icon.rotated {
-            transform: rotate(90deg);
-        }
-        .section-content {
-            padding: 15px;
-            border-top: 1px solid #e2e8f0;
-            display: none; /* Hidden by default */
-        }
-        .section-content.expanded {
-            display: block; /* Shown when expanded */
-        }
-        .admin-btn {
-            background-color: #4299e1;
-        }
-        .admin-btn:hover {
-            background-color: #3182ce;
-        }
-        .card {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #4a5568;
-        }
-        textarea {
-            resize: vertical;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>لوحة تحكم المستخدم</h1>
 
-        <div id="profileSection" class="user-info">
-            <h2 id="userName"></h2>
-            <div class="user-points" id="userPoints"></div>
-        </div>
+const express = require('express');
+const cors = require('cors');
+const { initializeApp } = require('firebase/app');
+const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } = require('firebase/auth');
+const { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where } = require('firebase/firestore');
 
-        <div id="authSection">
-            <div id="loginSection">
-                <h2>تسجيل الدخول</h2>
-                <form id="loginForm" class="login-form">
-                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
-                    <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
-                    <button type="submit">دخول</button>
-                </form>
-                <p>ليس لديك حساب؟ <a href="#" id="showRegister">تسجيل جديد</a></p>
-            </div>
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-            <div id="registerSection" style="display: none;">
-                <h2>التسجيل</h2>
-                <form id="registerForm" class="register-form">
-                    <input type="text" id="registerDisplayName" placeholder="اسم العرض" required>
-                    <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
-                    <input type="password" id="registerPassword" placeholder="كلمة المرور" required>
-                    <button type="submit">تسجيل</button>
-                </form>
-                <p>لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a></p>
-            </div>
-        </div>
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-        <div id="mainSection" style="display: none;">
-            <button onclick="loadAllUsersPoints()" class="leaderboard-btn">عرض لوحة الترتيب 🏆</button>
-            <button onclick="refreshUserPoints()" class="leaderboard-btn">تحديث نقاطي 🔄</button>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyB5pkNdm8ik_Fd2p13QElfVXWMZjJxqKBk",
+  authDomain: "owner-523c8.firebaseapp.com",
+  projectId: "owner-523c8",
+  storageBucket: "owner-523c8.firebasestorage.app",
+  messagingSenderId: "414224069376",
+  appId: "1:414224069376:web:6030d9f7b6b4a61e3a39e5",
+  measurementId: "G-5VBY5ZM24S"
+};
 
-            <button onclick="logout()" class="logout-btn">تسجيل الخروج 👋</button>
-                </div>
-            </div>
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
-            <!-- Point Request Section -->
-            <div id="pointRequestSection" style="display: none;">
-                <div class="card">
-                    <h3>طلب نقاط إضافية 🎯</h3>
-                    <div style="margin: 15px 0;">
-                        <label>عدد النقاط المطلوبة:</label>
-                        <input type="number" id="requestedPoints" min="1" max="100" placeholder="أدخل عدد النقاط">
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <label>سبب الطلب:</label>
-                        <textarea id="requestReason" placeholder="اشرح سبب طلب النقاط..." rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
-                    </div>
-                    <button onclick="submitPointRequest()" class="admin-btn">إرسال الطلب</button>
-                    <div id="requestStatus" style="margin-top: 10px;"></div>
-                </div>
-            </div>
+// Serve the main HTML page
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 
-            <!-- Admin Section -->
-            <div id="adminSection" style="display: none;">
-                <div class="card">
-                    <h3>لوحة تحكم الإدارة 🛠️</h3>
-
-                    <!-- PIN Management -->
-                    <div class="admin-section">
-                        <div class="section-header" onclick="toggleSection('pin-management')">
-                            <span id="pin-management-icon" class="section-icon">▶</span>
-                            <h4>إدارة رقم PIN</h4>
-                        </div>
-                        <div id="pin-management-content" class="section-content">
-                            <div style="margin: 10px 0;">
-                                <label>تعيين رقم PIN جديد:</label>
-                                <input type="number" id="newPin" placeholder="أدخل رقم PIN (4 أرقام)" maxlength="4">
-                                <button onclick="setAdminPin()" class="admin-btn">تعيين PIN</button>
-                            </div>
-                            <div id="currentPin" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Point Requests Management -->
-                    <div class="admin-section">
-                        <div class="section-header" onclick="toggleSection('point-requests')">
-                            <span id="point-requests-icon" class="section-icon">▶</span>
-                            <h4>طلبات النقاط المعلقة</h4>
-                        </div>
-                        <div id="point-requests-content" class="section-content">
-                            <button onclick="loadPointRequests()" class="admin-btn">تحديث الطلبات</button>
-                            <div id="pointRequestsList" style="margin-top: 15px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- All Users Section -->
-            <div id="allUsersSection" style="display: none;">
-                <div class="card">
-                    <h3>جميع المستخدمين</h3>
-                    <div id="usersList"></div>
-                </div>
-            </div>
-
-            <!-- User Points Display Section -->
-            <div id="userPointsSection" style="display: none;">
-                <div class="card">
-                    <h3>نقاط المستخدمين</h3>
-                    <div id="allUsersPointsList"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <script>
-        // Firebase Configuration (Replace with your actual Firebase config)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        let currentUser = null;
-        let isAdmin = false;
-
-        // Get DOM elements
-        const loginEmailInput = document.getElementById('loginEmail');
-        const loginPasswordInput = document.getElementById('loginPassword');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const showRegisterLink = document.getElementById('showRegister');
-        const showLoginLink = document.getElementById('showLogin');
-        const profileSection = document.getElementById('profileSection');
-        const userNameDisplay = document.getElementById('userName');
-        const userPointsDisplay = document.getElementById('userPoints');
-        const authSection = document.getElementById('authSection');
-        const mainSection = document.getElementById('mainSection');
-        const adminSection = document.getElementById('adminSection');
-        const pointRequestSection = document.getElementById('pointRequestSection');
-        const requestedPointsInput = document.getElementById('requestedPoints');
-        const requestReasonInput = document.getElementById('requestReason');
-        const requestStatusDisplay = document.getElementById('requestStatus');
-        const newPinInput = document.getElementById('newPin');
-        const currentPinDisplay = document.getElementById('currentPin');
-
-        // Authentication
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('registerSection').style.display = 'block';
+// Sign up function
+app.post('/signup', async (req, res) => {
+  try {
+    const { email, password, displayName } = req.body;
+    
+    // Check if display name already exists (if provided)
+    if (displayName && displayName.trim()) {
+      const usersCollection = collection(db, 'users');
+      const displayNameQuery = query(usersCollection, where('displayName', '==', displayName.trim()));
+      const displayNameSnapshot = await getDocs(displayNameQuery);
+      
+      if (!displayNameSnapshot.empty) {
+        return res.status(400).json({
+          success: false,
+          message: 'Display name already exists. Please choose a different one.'
         });
+      }
+    }
+    
+    // Create user with email and password
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Store additional user data in Firestore
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName ? displayName.trim() : '',
+      points: 1,
+      pin: null,
+      createdAt: new Date().toISOString()
+    });
+    
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: displayName ? displayName.trim() : ''
+      }
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
 
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('registerSection').style.display = 'none';
-            document.getElementById('loginSection').style.display = 'block';
+// User login function (display name only)
+app.post('/user-login', async (req, res) => {
+  try {
+    const { displayName } = req.body;
+    
+    if (!displayName || !displayName.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Display name is required'
+      });
+    }
+    
+    // Find user by display name
+    const usersCollection = collection(db, 'users');
+    const displayNameQuery = query(usersCollection, where('displayName', '==', displayName.trim()));
+    const displayNameSnapshot = await getDocs(displayNameQuery);
+    
+    if (displayNameSnapshot.empty) {
+      return res.status(404).json({
+        success: false,
+        message: 'User with this display name not found'
+      });
+    }
+    
+    // Get the user document
+    const userDoc = displayNameSnapshot.docs[0];
+    const userData = userDoc.data();
+    
+    // Don't allow admin to login via display name
+    if (userData.email === 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin must use email and password login'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        uid: userData.uid,
+        email: userData.email,
+        displayName: userData.displayName,
+        points: userData.points || 0,
+        lastLogin: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Admin login function (email and password)
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Sign in user with email and password
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Get user data from Firestore
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userData = userDoc.exists() ? userDoc.data() : {};
+    
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: userData.displayName || '',
+        lastLogin: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Logout function
+app.post('/logout', async (req, res) => {
+  try {
+    await signOut(auth);
+    res.status(200).json({
+      success: true,
+      message: 'Logout successful'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Get user profile
+app.get('/profile/:uid', async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    
+    if (userDoc.exists()) {
+      res.status(200).json({
+        success: true,
+        user: userDoc.data()
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Update user profile
+app.put('/profile/:uid', async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { displayName } = req.body;
+    
+    await setDoc(doc(db, 'users', uid), {
+      displayName: displayName,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Admin route to create new users
+app.post('/admin/create-user', async (req, res) => {
+  try {
+    const { adminEmail, email, password, displayName } = req.body;
+    
+    // Check if the requesting user is admin
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Check if display name already exists (if provided)
+    if (displayName && displayName.trim()) {
+      const usersCollection = collection(db, 'users');
+      const displayNameQuery = query(usersCollection, where('displayName', '==', displayName.trim()));
+      const displayNameSnapshot = await getDocs(displayNameQuery);
+      
+      if (!displayNameSnapshot.empty) {
+        return res.status(400).json({
+          success: false,
+          message: 'Display name already exists. Please choose a different one.'
         });
+      }
+    }
+    
+    // Create user with email and password
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Store additional user data in Firestore
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      email: user.email,
+      displayName: displayName ? displayName.trim() : '',
+      points: 1,
+      pin: null,
+      createdAt: new Date().toISOString(),
+      createdBy: adminEmail
+    });
+    
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: displayName ? displayName.trim() : ''
+      }
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = loginEmailInput.value;
-            const password = loginPasswordInput.value;
+// Admin route to get all users
+app.get('/admin/users', async (req, res) => {
+  try {
+    const { adminEmail } = req.query;
+    
+    // Check if the requesting user is admin
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Import additional Firestore functions
+    const { collection, getDocs } = require('firebase/firestore');
+    
+    // Get all users from Firestore
+    const usersCollection = collection(db, 'users');
+    const usersSnapshot = await getDocs(usersCollection);
+    
+    const users = [];
+    usersSnapshot.forEach((doc) => {
+      users.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    res.status(200).json({
+      success: true,
+      users: users,
+      totalUsers: users.length
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
 
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                currentUser = userCredential.user;
-                await loadUserData();
-                showMessage('تم تسجيل الدخول بنجاح!');
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
-        });
+// Admin route to update user points
+app.put('/admin/update-points', async (req, res) => {
+  try {
+    const { adminEmail, userId, points } = req.body;
+    
+    // Check if the requesting user is admin
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Update user points in Firestore
+    await setDoc(doc(db, 'users', userId), {
+      points: parseInt(points),
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Points updated successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
 
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const displayName = document.getElementById('registerDisplayName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
+// Admin route to update user points by display name
+app.put('/admin/update-points-by-name', async (req, res) => {
+  try {
+    const { adminEmail, displayName, points } = req.body;
+    
+    // Check if the requesting user is admin
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Find user by display name
+    const usersCollection = collection(db, 'users');
+    const displayNameQuery = query(usersCollection, where('displayName', '==', displayName.trim()));
+    const displayNameSnapshot = await getDocs(displayNameQuery);
+    
+    if (displayNameSnapshot.empty) {
+      return res.status(404).json({
+        success: false,
+        message: 'User with this display name not found.'
+      });
+    }
+    
+    // Get the first (should be only) user with this display name
+    const userDoc = displayNameSnapshot.docs[0];
+    const userId = userDoc.id;
+    
+    // Update user points in Firestore
+    await setDoc(doc(db, 'users', userId), {
+      points: parseInt(points),
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Points updated successfully',
+      userEmail: userDoc.data().email
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
 
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                currentUser = userCredential.user;
-
-                await db.collection('users').doc(currentUser.uid).set({
-                    uid: currentUser.uid,
-                    email: email,
-                    displayName: displayName,
-                    points: 0,
-                    isAdmin: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                await auth.currentUser.updateProfile({ displayName: displayName });
-
-                localStorage.setItem('userSession', JSON.stringify({ uid: currentUser.uid, email: currentUser.email, displayName: displayName, points: 0, isAdmin: false }));
-                showProfile(currentUser, 0);
-                mainSection.style.display = 'block';
-                authSection.style.display = 'none';
-                showMessage('تم إنشاء الحساب بنجاح!');
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
-        });
-
-        // Load user data from Firestore
-        async function loadUserData() {
-            try {
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    currentUser = { ...currentUser, ...userData };
-                    isAdmin = userData.isAdmin || false;
-                    showProfile(currentUser);
-                    toggleSections();
-                    localStorage.setItem('userSession', JSON.stringify(userData));
-                } else {
-                    // User might not exist in Firestore yet (e.g., first login after registration)
-                    await db.collection('users').doc(currentUser.uid).set({
-                        uid: currentUser.uid,
-                        email: currentUser.email,
-                        displayName: currentUser.displayName || currentUser.email.split('@')[0],
-                        points: 0,
-                        isAdmin: false,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    currentUser = { ...currentUser, displayName: currentUser.displayName || currentUser.email.split('@')[0], points: 0, isAdmin: false };
-                    isAdmin = false;
-                    showProfile(currentUser);
-                    toggleSections();
-                    localStorage.setItem('userSession', JSON.stringify({ uid: currentUser.uid, email: currentUser.email, displayName: currentUser.displayName, points: 0, isAdmin: false }));
-                }
-            } catch (error) {
-                showMessage('خطأ في تحميل بيانات المستخدم: ' + error.message, 'error');
-            }
+// Admin route to update display name by current display name
+app.put('/admin/update-display-name-by-name', async (req, res) => {
+  try {
+    const { adminEmail, currentDisplayName, newDisplayName } = req.body;
+    
+    // Check if the requesting user is admin
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Check if new display name already exists (unless it's the same user)
+    if (newDisplayName && newDisplayName.trim()) {
+      const usersCollection = collection(db, 'users');
+      const newDisplayNameQuery = query(usersCollection, where('displayName', '==', newDisplayName.trim()));
+      const newDisplayNameSnapshot = await getDocs(newDisplayNameQuery);
+      
+      if (!newDisplayNameSnapshot.empty) {
+        const existingUser = newDisplayNameSnapshot.docs[0].data();
+        if (existingUser.displayName !== currentDisplayName) {
+          return res.status(400).json({
+            success: false,
+            message: 'New display name already exists. Please choose a different one.'
+          });
         }
-
-        // Show profile information
-        function showProfile(user) {
-            if (user) {
-                userNameDisplay.textContent = user.displayName || 'مستخدم';
-                userPointsDisplay.textContent = `${user.points || 0} نقطة`;
-                profileSection.style.display = 'flex';
-            } else {
-                profileSection.style.display = 'none';
-            }
-        }
-
-        // Toggle sections based on user role
-        function toggleSections() {
-            if (currentUser) {
-                authSection.style.display = 'none';
-                mainSection.style.display = 'block';
-                if (isAdmin) {
-                    adminSection.style.display = 'block';
-                    pointRequestSection.style.display = 'none'; // Hide for admin
-                } else {
-                    adminSection.style.display = 'none';
-                    pointRequestSection.style.display = 'block'; // Show for users
-                }
-            } else {
-                authSection.style.display = 'block';
-                mainSection.style.display = 'none';
-                document.getElementById('loginSection').style.display = 'block';
-                document.getElementById('registerSection').style.display = 'none';
-                document.getElementById('allUsersSection').style.display = 'none';
-                document.getElementById('adminSection').style.display = 'none';
-                document.getElementById('pointRequestSection').style.display = 'none';
-            }
-        }
-
-        // Check for saved session
-        function checkSavedSession() {
-            const savedSession = localStorage.getItem('userSession');
-            if (savedSession) {
-                const sessionData = JSON.parse(savedSession);
-                currentUser = {
-                    uid: sessionData.uid,
-                    email: sessionData.email,
-                    displayName: sessionData.displayName,
-                    points: sessionData.points,
-                    isAdmin: sessionData.isAdmin
-                };
-                isAdmin = sessionData.isAdmin;
-                showProfile(currentUser);
-                toggleSections();
-                return true;
-            }
-            return false;
-        }
-
-        // Show message
-        function showMessage(msg, type = 'success') {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            messageDiv.textContent = msg;
-            document.getElementById('authSection').prepend(messageDiv);
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 3000);
-        }
-
-        // Show login page
-        function showLogin() {
-            authSection.style.display = 'block';
-            mainSection.style.display = 'none';
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('registerSection').style.display = 'none';
-            document.getElementById('allUsersSection').style.display = 'none';
-            document.getElementById('adminSection').style.display = 'none';
-            document.getElementById('pointRequestSection').style.display = 'none';
-            currentUser = null;
-            isAdmin = false;
-        }
-
-        // Submit Point Request
-        window.submitPointRequest = async function() {
-            if (!currentUser) {
-                showMessage('Please log in to submit a request.', 'error');
-                return;
-            }
-
-            const requestedPoints = parseInt(requestedPointsInput.value);
-            const requestReason = requestReasonInput.value.trim();
-
-            if (isNaN(requestedPoints) || requestedPoints < 1 || requestedPoints > 100) {
-                requestStatusDisplay.textContent = 'Please enter a valid number of points between 1 and 100.';
-                requestStatusDisplay.style.color = 'red';
-                return;
-            }
-
-            if (!requestReason) {
-                requestStatusDisplay.textContent = 'Please provide a reason for your request.';
-                requestStatusDisplay.style.color = 'red';
-                return;
-            }
-
-            try {
-                await db.collection('pointRequests').add({
-                    userId: currentUser.uid,
-                    displayName: currentUser.displayName,
-                    requestedPoints: requestedPoints,
-                    reason: requestReason,
-                    status: 'pending',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                requestStatusDisplay.textContent = 'Your request has been submitted successfully!';
-                requestStatusDisplay.style.color = 'green';
-                requestedPointsInput.value = '';
-                requestReasonInput.value = '';
-            } catch (error) {
-                requestStatusDisplay.textContent = 'Error submitting request: ' + error.message;
-                requestStatusDisplay.style.color = 'red';
-            }
-        }
-
-        // Load point requests for admin
-        window.loadPointRequests = async function() {
-            if (!isAdmin) return;
-
-            const pointRequestsList = document.getElementById('pointRequestsList');
-            pointRequestsList.innerHTML = 'Loading requests...';
-
-            try {
-                const snapshot = await db.collection('pointRequests').orderBy('timestamp', 'desc').get();
-                if (snapshot.empty) {
-                    pointRequestsList.innerHTML = 'No pending requests.';
-                    return;
-                }
-
-                let requestsHtml = '';
-                snapshot.forEach(doc => {
-                    const request = doc.data();
-                    const id = doc.id;
-                    requestsHtml += `
-                        <div class="card" style="margin-bottom: 15px; padding: 15px;">
-                            <p><strong>User:</strong> ${request.displayName || 'N/A'}</p>
-                            <p><strong>Points Requested:</strong> ${request.requestedPoints}</p>
-                            <p><strong>Reason:</strong> ${request.reason}</p>
-                            <p><strong>Status:</strong> ${request.status === 'pending' ? 'Pending' : request.status}</p>
-                            ${request.status === 'pending' ? `
-                                <button onclick="approvePointRequest('${id}', ${request.requestedPoints}, '${request.userId}')" class="admin-btn" style="background-color: #38a169; margin-right: 5px;">Approve</button>
-                                <button onclick="rejectPointRequest('${id}')" class="admin-btn" style="background-color: #e53e3e;">Reject</button>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-                pointRequestsList.innerHTML = requestsHtml;
-            } catch (error) {
-                pointRequestsList.innerHTML = 'Error loading requests.';
-                console.error("Error loading point requests: ", error);
-            }
-        }
-
-        // Approve point request
-        window.approvePointRequest = async function(requestId, pointsToAdd, userId) {
-            if (!isAdmin) return;
-
-            try {
-                // Update request status
-                await db.collection('pointRequests').doc(requestId).update({ status: 'approved' });
-
-                // Add points to user
-                const userRef = db.collection('users').doc(userId);
-                await userRef.update({
-                    points: firebase.firestore.FieldValue.increment(pointsToAdd)
-                });
-
-                // Refresh user data and display
-                const updatedUserDoc = await userRef.get();
-                const userData = updatedUserDoc.data();
-                currentUser.points = userData.points;
-                showProfile(currentUser);
-
-                loadPointRequests(); // Reload requests
-                showMessage('Point request approved and points added!');
-            } catch (error) {
-                console.error("Error approving point request: ", error);
-                showMessage('Error approving request: ' + error.message, 'error');
-            }
-        }
-
-        // Reject point request
-        window.rejectPointRequest = async function(requestId) {
-            if (!isAdmin) return;
-
-            try {
-                await db.collection('pointRequests').doc(requestId).update({ status: 'rejected' });
-                loadPointRequests(); // Reload requests
-                showMessage('Point request rejected.');
-            } catch (error) {
-                console.error("Error rejecting point request: ", error);
-                showMessage('Error rejecting request: ' + error.message, 'error');
-            }
-        }
-
-        // Set Admin PIN
-        window.setAdminPin = async function() {
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            const newPin = newPinInput.value.trim();
-            if (!/^\d{4}$/.test(newPin)) {
-                showMessage('PIN must be exactly 4 digits.', 'error');
-                return;
-            }
-
-            try {
-                await db.collection('adminSettings').doc('pin').set({ pin: newPin });
-                showMessage('Admin PIN set successfully!');
-                newPinInput.value = '';
-                displayCurrentPin();
-            } catch (error) {
-                showMessage('Error setting PIN: ' + error.message, 'error');
-            }
-        }
-
-        // Display current admin PIN
-        async function displayCurrentPin() {
-            if (!isAdmin) return;
-            try {
-                const doc = await db.collection('adminSettings').doc('pin').get();
-                if (doc.exists) {
-                    currentPinDisplay.textContent = `Current PIN: ${doc.data().pin}`;
-                } else {
-                    currentPinDisplay.textContent = 'No PIN set yet.';
-                }
-            } catch (error) {
-                currentPinDisplay.textContent = 'Error fetching PIN.';
-                console.error("Error fetching PIN: ", error);
-            }
-        }
-
-        // Load all users for admin view
-        window.loadAllUsers = async function() {
-            if (!isAdmin) return;
-
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = 'Loading users...';
-
-            try {
-                const snapshot = await db.collection('users').orderBy('displayName').get();
-                if (snapshot.empty) {
-                    usersList.innerHTML = 'No users found.';
-                    return;
-                }
-
-                let usersHtml = '<div class="leaderboard">';
-                snapshot.forEach((doc, index) => {
-                    const user = doc.data();
-                    const isCurrentUserAdmin = user.email === 'mahmod@gmail.com'; // Assuming 'mahmod@gmail.com' is the admin
-                    const rankInfo = getRankInfo(user.points || 0, isCurrentUserAdmin);
-                    const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
-                    const positionColor = positionColors[index] || '#17a2b8';
-
-                    usersHtml += `
-                        <div class="leaderboard-item" style="border-right-color: ${positionColor};">
-                            <div class="leaderboard-content">
-                                <div class="user-info">
-                                    <div class="position">
-                                        ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
-                                    </div>
-                                    <div class="user-details">
-                                        <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
-                                        <div class="user-rank">
-                                            <span style="font-size: 18px;">${rankInfo.icon}</span>
-                                            <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
-                                        </div>
-                                        <small>${user.email}</small>
-                                    </div>
-                                </div>
-                                <div class="user-points">
-                                    ${user.points || 0} نقطة
-                                    ${isAdmin ? `<button onclick="deleteUser('${user.email}')" class="action-btn" style="background-color: #e53e3e; font-size: 12px; padding: 5px 10px; margin-left: 10px;">Delete</button>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                usersHtml += '</div>';
-                usersList.innerHTML = usersHtml;
-            } catch (error) {
-                usersList.innerHTML = 'Error loading users.';
-                console.error("Error loading users: ", error);
-            }
-        }
-
-
-        // Function to get rank based on points
-        function getRankInfo(points, isAdminUser) {
-            if (isAdminUser) {
-                return { name: 'Admin', icon: '👑', color: '#e53e3e' };
-            }
-            if (points >= 1000) return { name: 'Master', icon: '💎', color: '#50e3c2' };
-            if (points >= 750) return { name: 'Gold', icon: '⭐', color: '#f6e05e' };
-            if (points >= 500) return { name: 'Silver', icon: '🌙', color: '#a0aec0' };
-            if (points >= 250) return { name: 'Bronze', icon: '🥉', color: '#dd6b20' };
-            return { name: 'Rookie', icon: '🌱', color: '#48bb78' };
-        }
-
-        // Show leaderboard modal
-        window.showLeaderboardModal = function() {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <span class="close-btn" onclick="this.parentElement.parentElement.remove()">&times;</span>
-                    <h3>لوحة الترتيب العالمية</h3>
-                    <div id="leaderboardContent"></div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            loadLeaderboard(modal);
-        }
-
-        // Load leaderboard data
-        async function loadLeaderboard(modal) {
-            const leaderboardContent = modal.querySelector('#leaderboardContent');
-            leaderboardContent.innerHTML = 'Loading leaderboard...';
-
-            try {
-                const usersRef = collection(db, 'users');
-                const querySnapshot = await getDocs(usersRef);
-
-                let usersData = [];
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    if (userData.email && userData.email !== 'undefined') {
-                        usersData.push(userData);
-                    }
-                });
-
-                usersData.sort((a, b) => (b.points || 0) - (a.points || 0));
-
-                let leaderboardHtml = '<div class="leaderboard">';
-                usersData.forEach((user, index) => {
-                    const isAdminUser = user.email === 'mahmod@gmail.com';
-                    const rankInfo = getRankInfo(user.points || 0, isAdminUser);
-                    const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
-                    const positionColor = positionColors[index] || '#17a2b8';
-
-                    leaderboardHtml += `
-                        <div class="leaderboard-item" style="border-right-color: ${positionColor};">
-                            <div class="leaderboard-content">
-                                <div class="user-info">
-                                    <div class="position">
-                                        ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
-                                    </div>
-                                    <div class="user-details">
-                                        <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
-                                        <div class="user-rank">
-                                            <span style="font-size: 18px;">${rankInfo.icon}</span>
-                                            <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="user-points">
-                                    ${user.points || 0} نقطة
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                leaderboardHtml += '</div>';
-                leaderboardContent.innerHTML = leaderboardHtml;
-
-            } catch (error) {
-                leaderboardContent.innerHTML = 'Failed to load leaderboard.';
-                console.error("Error loading leaderboard: ", error);
-            }
-        }
-
-        // Load all users points (this seems redundant with loadLeaderboard, adjust as needed)
-        window.loadAllUsersPoints = async function() {
-            const allUsersPointsList = document.getElementById('allUsersPointsList');
-            allUsersPointsList.innerHTML = `
-                <div class="leaderboard">
-                    <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">جاري التحميل...</h4>
-                </div>
-            `;
-
-            try {
-                const usersRef = collection(db, 'users');
-                const querySnapshot = await getDocs(usersRef);
-
-                const validUsers = [];
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    if (userData.email && userData.email !== 'undefined') {
-                        validUsers.push(userData);
-                    }
-                });
-
-                validUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
-
-                allUsersPointsList.innerHTML = `
-                    <div class="leaderboard">
-                        <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">(${validUsers.length})</h4>
-                        ${validUsers.map((user, index) => {
-                            const isAdminUser = user.email === 'mahmod@gmail.com';
-                            const rankInfo = getRankInfo(user.points || 0, isAdminUser);
-                            const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
-                            const positionColor = positionColors[index] || '#17a2b8';
-
-                            return `
-                                <div class="leaderboard-item" style="border-right-color: ${positionColor};">
-                                    <div class="leaderboard-content">
-                                        <div class="user-info">
-                                            <div class="position">
-                                                ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
-                                            </div>
-                                            <div class="user-details">
-                                                <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
-                                                <div class="user-rank">
-                                                    <span style="font-size: 18px;">${rankInfo.icon}</span>
-                                                    <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="user-points">
-                                            ${user.points || 0} نقطة
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            } catch (error) {
-                showMessage('خطأ في تحميل نقاط المستخدمين: ' + error.message, 'error');
-            }
-        }
-
-        // Refresh user points
-        window.refreshUserPoints = async function() {
-            if (!currentUser) {
-                showMessage('لا يوجد مستخدم مسجل', 'error');
-                return;
-            }
-
-            try {
-                const savedSession = localStorage.getItem('userSession');
-                if (savedSession) {
-                    const sessionData = JSON.parse(savedSession);
-
-                    // Fetch fresh data from Firestore
-                    const usersRef = collection(db, 'users');
-                    const q = query(usersRef, where('displayName', '==', sessionData.displayName));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        const userDoc = querySnapshot.docs[0];
-                        const userData = userDoc.data();
-
-                        const updatedUserInfo = {
-                            uid: userData.uid,
-                            email: userData.email,
-                            displayName: userData.displayName,
-                            points: userData.points || 0,
-                            isAdmin: userData.isAdmin || false
-                        };
-
-                        localStorage.setItem('userSession', JSON.stringify(updatedUserInfo));
-                        currentUser = updatedUserInfo; // Update current user state
-                        showProfile(updatedUserInfo);
-                        toggleSections(); // Re-toggle sections to ensure correct display
-                        showMessage('تم تحديث النقاط! ✨');
-                        return;
-                    }
-                }
-
-                // Fallback for Firebase auth users if session data is somehow incomplete or missing
-                if (auth.currentUser) {
-                    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                    const userData = userDoc.exists() ? userDoc.data() : {};
-
-                    const updatedUserInfo = {
-                        uid: currentUser.uid,
-                        email: currentUser.email,
-                        displayName: userData.displayName || currentUser.displayName || '',
-                        points: userData.points || 0,
-                        isAdmin: userData.isAdmin || false
-                    };
-
-                    localStorage.setItem('userSession', JSON.stringify(updatedUserInfo));
-                    currentUser = updatedUserInfo;
-                    showProfile(updatedUserInfo);
-                    toggleSections();
-                    showMessage('Points refreshed!');
-                }
-            } catch (error) {
-                showMessage('خطأ في تحديث النقاط: ' + error.message, 'error');
-            }
-        }
-
-        // Toggle admin sections
-        window.toggleSection = function(sectionId) {
-            const content = document.getElementById(sectionId + '-content');
-            const icon = document.getElementById(sectionId + '-icon');
-
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-                icon.textContent = '▶';
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-                icon.textContent = '▼';
-            }
-        }
-
-        // Delete user function
-        window.deleteUser = async function(identifier) {
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to delete user with email "${identifier}"?`)) {
-                return;
-            }
-
-            try {
-                const usersRef = collection(db, 'users');
-                let q;
-
-                // Assuming identifier is always email for deletion
-                q = query(usersRef, where('email', '==', identifier));
-
-
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    showMessage('User not found.', 'error');
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
-
-                // Prevent deleting the main admin account
-                if (userData.email === 'mahmod@gmail.com') {
-                    showMessage('Cannot delete the main admin account.', 'error');
-                    return;
-                }
-
-                await deleteDoc(doc(db, 'users', userDoc.id));
-
-                showMessage('User deleted successfully!');
-
-                // Refresh the user list if it's visible
-                if (document.getElementById('usersList').innerHTML) {
-                    loadAllUsers();
-                }
-            } catch (error) {
-                showMessage('Error deleting user: ' + error.message, 'error');
-            }
-        }
-
-        // Logout function
-        window.logout = async function() {
-            try {
-                await auth.signOut();
-                currentUser = null;
-                isAdmin = false;
-                localStorage.removeItem('userSession');
-                showLogin();
-                showMessage('تم تسجيل الخروج بنجاح! 👋');
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
-        }
-
-        // Initialize
-        window.addEventListener('load', () => {
-            if (!checkSavedSession()) {
-                showLogin();
-            } else {
-                // If session is saved, directly show the main section and toggle based on admin status
-                toggleSections();
-                // Load initial data for admin/user sections if needed
-                if(isAdmin) {
-                    loadAllUsers();
-                    displayCurrentPin();
-                    loadPointRequests();
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+      }
+    }
+    
+    // Find user by current display name
+    const usersCollection = collection(db, 'users');
+    const displayNameQuery = query(usersCollection, where('displayName', '==', currentDisplayName.trim()));
+    const displayNameSnapshot = await getDocs(displayNameQuery);
+    
+    if (displayNameSnapshot.empty) {
+      return res.status(404).json({
+        success: false,
+        message: 'User with this display name not found.'
+      });
+    }
+    
+    // Get the user document
+    const userDoc = displayNameSnapshot.docs[0];
+    const userId = userDoc.id;
+    const userData = userDoc.data();
+    
+    // Update display name in Firestore
+    await setDoc(doc(db, 'users', userId), {
+      displayName: newDisplayName ? newDisplayName.trim() : '',
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Display name updated successfully',
+      userEmail: userData.email,
+      oldDisplayName: currentDisplayName,
+      newDisplayName: newDisplayName
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Admin route to delete user by display name
+app.delete('/admin/delete-user-by-name', async (req, res) => {
+  try {
+    const { adminEmail, targetDisplayName } = req.body;
+    
+    // Check if the requesting user is admin
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Find user by display name
+    const usersCollection = collection(db, 'users');
+    const displayNameQuery = query(usersCollection, where('displayName', '==', targetDisplayName.trim()));
+    const displayNameSnapshot = await getDocs(displayNameQuery);
+    
+    if (displayNameSnapshot.empty) {
+      return res.status(404).json({
+        success: false,
+        message: 'User with this display name not found.'
+      });
+    }
+    
+    // Get the user document
+    const userDoc = displayNameSnapshot.docs[0];
+    const userData = userDoc.data();
+    
+    // Prevent admin from deleting themselves
+    if (userData.email === adminEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete your own account.'
+      });
+    }
+    
+    // Delete the user document
+    const { deleteDoc } = require('firebase/firestore');
+    await deleteDoc(doc(db, 'users', userDoc.id));
+    
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
+      deletedUser: userData.email
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Point request system
+let pointRequests = new Map(); // Store pending requests
+let userMutes = new Map(); // Store muted users with expiry time
+let userWarnings = new Map(); // Store user warning counts
+
+// Check request status for user notifications
+app.get('/check-request-status', async (req, res) => {
+  try {
+    const { requestId, userDisplayName } = req.query;
+    
+    if (!requestId || !userDisplayName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Request ID and user display name are required'
+      });
+    }
+    
+    const request = pointRequests.get(requestId);
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Request not found or expired'
+      });
+    }
+    
+    // Verify the request belongs to this user
+    if (request.userDisplayName !== userDisplayName) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      status: request.status,
+      pointsRequested: request.pointsRequested,
+      pointsDeducted: request.pointsDeducted || 0
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+
+
+
+
+// Admin update user PIN
+app.put('/admin/update-pin', async (req, res) => {
+  try {
+    const { adminEmail, displayName, newPin } = req.body;
+    
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    if (!/^\d{4}$/.test(newPin)) {
+      return res.status(400).json({
+        success: false,
+        message: 'PIN must be exactly 4 digits'
+      });
+    }
+    
+    // Find user by display name
+    const usersCollection = collection(db, 'users');
+    const displayNameQuery = query(usersCollection, where('displayName', '==', displayName.trim()));
+    const displayNameSnapshot = await getDocs(displayNameQuery);
+    
+    if (displayNameSnapshot.empty) {
+      return res.status(404).json({
+        success: false,
+        message: 'User with this display name not found.'
+      });
+    }
+    
+    // Get the user document
+    const userDoc = displayNameSnapshot.docs[0];
+    const userId = userDoc.id;
+    
+    // Update PIN in Firestore
+    await setDoc(doc(db, 'users', userId), {
+      pin: newPin,
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+    
+    res.status(200).json({
+      success: true,
+      message: `PIN updated for ${displayName}`
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// User requests points
+app.post('/request-points', async (req, res) => {
+  try {
+    const { userDisplayName, pointsRequested, pin } = req.body;
+    
+    if (!userDisplayName || !pointsRequested || !pin) {
+      return res.status(400).json({
+        success: false,
+        message: 'Display name, points requested, and PIN are required'
+      });
+    }
+    
+    if (!/^\d{4}$/.test(pin)) {
+      return res.status(400).json({
+        success: false,
+        message: 'PIN must be exactly 4 digits'
+      });
+    }
+    
+    // Find user by display name and get their PIN
+    const usersCollection = collection(db, 'users');
+    const displayNameQuery = query(usersCollection, where('displayName', '==', userDisplayName.trim()));
+    const displayNameSnapshot = await getDocs(displayNameQuery);
+    
+    if (displayNameSnapshot.empty) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    const userDoc = displayNameSnapshot.docs[0];
+    const userData = userDoc.data();
+    
+    // Check if admin has set a PIN for this user
+    if (!userData.pin) {
+      return res.status(400).json({
+        success: false,
+        message: 'PIN not set by admin. Please contact admin to set your PIN.'
+      });
+    }
+    
+    // Verify PIN
+    if (userData.pin !== pin) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect PIN'
+      });
+    }
+    
+    if (![1, 2, 3].includes(parseInt(pointsRequested))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Can only request 1, 2, or 3 points'
+      });
+    }
+    
+    // Check if user is muted
+    const now = Date.now();
+    if (userMutes.has(userDisplayName) && userMutes.get(userDisplayName) > now) {
+      return res.status(429).json({
+        success: false,
+        message: 'You are muted for 1 minute. Please wait before making another request.'
+      });
+    }
+    
+    // Don't allow admin to request points
+    if (userData.email === 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin cannot request points'
+      });
+    }
+    
+    // Create request ID
+    const requestId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    // Store the request
+    pointRequests.set(requestId, {
+      id: requestId,
+      userId: userDoc.id,
+      userDisplayName: userDisplayName,
+      userEmail: userData.email,
+      pointsRequested: parseInt(pointsRequested),
+      timestamp: now,
+      status: 'pending'
+    });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Point request submitted successfully',
+      requestId: requestId
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Admin gets pending requests
+app.get('/admin/point-requests', async (req, res) => {
+  try {
+    const { adminEmail } = req.query;
+    
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    // Filter out expired requests (older than 5 minutes)
+    const now = Date.now();
+    const fiveMinutesAgo = now - (5 * 60 * 1000);
+    
+    for (const [requestId, request] of pointRequests.entries()) {
+      if (request.timestamp < fiveMinutesAgo) {
+        pointRequests.delete(requestId);
+      }
+    }
+    
+    const pendingRequests = Array.from(pointRequests.values())
+      .filter(request => request.status === 'pending')
+      .sort((a, b) => b.timestamp - a.timestamp);
+    
+    res.status(200).json({
+      success: true,
+      requests: pendingRequests
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+// Admin responds to point request
+app.post('/admin/respond-point-request', async (req, res) => {
+  try {
+    const { adminEmail, requestId, action } = req.body; // action: 'approve', 'deny', 'warn', 'mute'
+    
+    if (adminEmail !== 'mahmod@gmail.com') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+    
+    const request = pointRequests.get(requestId);
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Request not found or expired'
+      });
+    }
+    
+    if (request.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Request already processed'
+      });
+    }
+    
+    let responseMessage = '';
+    
+    if (action === 'approve') {
+      // Add points to user
+      await setDoc(doc(db, 'users', request.userId), {
+        points: (await getDoc(doc(db, 'users', request.userId))).data().points + request.pointsRequested,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      
+      request.status = 'approved';
+      responseMessage = `Approved ${request.pointsRequested} points for ${request.userDisplayName}`;
+      
+    } else if (action === 'deny') {
+      request.status = 'denied';
+      responseMessage = `Denied point request from ${request.userDisplayName}`;
+      
+    } else if (action === 'warn') {
+      // Increment warning count
+      const currentWarnings = userWarnings.get(request.userDisplayName) || 0;
+      const newWarnings = currentWarnings + 1;
+      userWarnings.set(request.userDisplayName, newWarnings);
+      
+      if (newWarnings >= 2) {
+        // Subtract points after 2 warnings
+        const userDoc = await getDoc(doc(db, 'users', request.userId));
+        const currentPoints = userDoc.data().points || 0;
+        const newPoints = Math.max(0, currentPoints - 3); // Subtract 3 points, minimum 0
+        
+        await setDoc(doc(db, 'users', request.userId), {
+          points: newPoints,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        
+        responseMessage = `Warned ${request.userDisplayName} (2nd warning) - 3 points deducted`;
+        userWarnings.delete(request.userDisplayName); // Reset warnings after penalty
+      } else {
+        responseMessage = `Warned ${request.userDisplayName} (Warning ${newWarnings}/2)`;
+      }
+      
+      request.status = 'warned';
+      
+      // Add flag to indicate if points were deducted
+      request.pointsDeducted = newWarnings >= 2 ? 3 : 0;
+      
+    } else if (action === 'mute') {
+      // Mute user for 1 minute
+      const muteUntil = Date.now() + (60 * 1000); // 1 minute
+      userMutes.set(request.userDisplayName, muteUntil);
+      
+      request.status = 'muted';
+      responseMessage = `Muted ${request.userDisplayName} for 1 minute`;
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: responseMessage,
+      action: action,
+      pointsDeducted: request.pointsDeducted || 0
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+});

@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
 // Firebase configuration
 const firebaseConfig = {
@@ -31,7 +30,7 @@ const db = getFirestore(firebaseApp);
 
 // Serve the main HTML page
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 // Sign up function

@@ -3,1132 +3,546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة النقاط الذكية</title>
+    <title>نظام النقاط والترتيب</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
             margin: 0;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            direction: rtl;
         }
-
         .container {
-            max-width: 450px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 20px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-
-        .content {
-            padding: 30px 25px;
-        }
-
-        /* User Login Styles */
-        .user-login {
-            text-align: center;
-        }
-
-        .user-login h2 {
-            color: #667eea;
-            font-size: 24px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 18px 20px;
-            border: 3px solid #e8f0fe;
-            border-radius: 15px;
-            font-size: 18px;
-            background: #f8faff;
-            color: #333;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .user-login-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-
-        .user-login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .user-login-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .admin-link {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 16px;
-            padding: 10px 20px;
-            border: 2px solid #667eea;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .admin-link:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Admin Login Styles */
-        #adminLoginForm {
-            display: none;
-        }
-
-        #adminLoginForm input, #adminLoginForm button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            box-sizing: border-box;
-        }
-
-        #adminLoginForm button {
-            background: #007cba;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        #adminLoginForm button:hover {
-            background: #005a87;
-        }
-
-        /* User Profile Styles */
-        .user-profile {
-            display: none;
-        }
-
-        .profile-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .profile-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .points-display {
-            font-size: 20px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .refresh-btn {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .refresh-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
-        }
-
-        .rank-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 4px solid #f0f8ff;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .rank-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
-            opacity: 0.1;
-        }
-
-        .rank-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .rank-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .rank-icon {
-            font-size: 40px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-        }
-
-        .rank-details h3 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .rank-details p {
-            margin: 5px 0 0 0;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .rank-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .rank-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .progress-section {
+            width: 90%;
+            max-width: 700px;
             margin-top: 20px;
         }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar {
-            background: #f0f8ff;
-            height: 12px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 10px;
-            transition: width 0.8s ease;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .max-rank {
-            text-align: center;
+        h1 {
             color: #667eea;
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 15px;
-        }
-
-        .points-section {
-            background: #f8faff;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .points-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             margin-bottom: 20px;
         }
-
-        .points-title {
-            color: #667eea;
-            font-size: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .view-points-btn {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            min-width: 80px;
-        }
-
-        .view-points-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
-        }
-
-        .leaderboard {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .leaderboard-item {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-right: 5px solid;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-        }
-
-        .leaderboard-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .leaderboard-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .position {
-            font-size: 18px;
-            font-weight: bold;
-            color: #495057;
-            min-width: 40px;
-        }
-
-        .user-details h4 {
-            margin: 0;
-            color: #495057;
-            font-size: 16px;
-        }
-
-        .user-rank {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 5px;
-        }
-
-        .user-points {
-            text-align: left;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .logout-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
-        }
-
-        /* Admin Panel Styles */
-        .admin-panel { 
-            margin-top: 20px; 
-            padding-top: 20px; 
-            border-top: 1px solid #eee; 
-        }
-
-        .admin-section {
-            background: #f8f9fa;
-            margin: 15px 0;
-            border-radius: 5px;
-            border-left: 4px solid #007cba;
-            overflow: hidden;
-        }
-
-        .admin-section-header {
-            padding: 15px;
-            cursor: pointer;
-            user-select: none;
+            background-color: #eef2f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            transition: background-color 0.2s ease;
         }
-
-        .admin-section-header:hover {
-            background: #e9ecef;
+        .user-info h2 {
+            margin: 0;
+            color: #4a5568;
         }
-
-        .admin-section-content {
-            padding: 15px;
-            display: none;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .admin-section-content.expanded {
-            display: block;
-        }
-
-        .expand-icon {
-            transition: transform 0.3s ease;
+        .user-points {
+            font-size: 1.2em;
             font-weight: bold;
+            color: #667eea;
+        }
+        .leaderboard-btn, .admin-btn, .logout-btn, .action-btn {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 16px;
-        }
-
-        .expand-icon.rotated {
-            transform: rotate(90deg);
-        }
-
-        .admin-subsection {
-            background: white;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border: 1px solid #e9ecef;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                max-height: 0;
-            }
-            to {
-                opacity: 1;
-                max-height: 500px;
-            }
-        }
-
-        .user-item {
-            background: #f8f9fa;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 3px;
-            border-left: 3px solid #007cba;
-        }
-
-        .section-button {
-            background: #17a2b8 !important;
-            margin-bottom: 10px;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 3px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .section-button:hover {
-            background: #138496 !important;
-        }
-
-        .create-button {
-            background: #28a745 !important;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 3px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .create-button:hover {
-            background: #218838 !important;
-        }
-
-        .update-button {
-            background: #ffc107 !important;
-            color: #212529 !important;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .update-button:hover {
-            background: #e0a800 !important;
-        }
-
-        .delete-button {
-            background: #dc3545 !important;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .delete-button:hover {
-            background: #c82333 !important;
-        }
-
-        /* Admin form styles */
-        .admin-panel input, .admin-panel button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            box-sizing: border-box;
-        }
-
-        .admin-panel h2, .admin-panel h3, .admin-panel h4, .admin-panel h5 {
-            margin: 10px 0;
-            direction: ltr;
-            text-align: left;
-        }
-
-        /* Message Styles */
-        .message {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            text-align: center;
             font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+            display: inline-block;
         }
-
-        .success { 
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
-            color: #155724; 
-            border: 2px solid #b8daff;
+        .leaderboard-btn:hover, .admin-btn:hover, .logout-btn:hover, .action-btn:hover {
+            background-color: #5a67d8;
+            transform: translateY(-2px);
         }
-
-        .error { 
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); 
-            color: #721c24; 
-            border: 2px solid #f5c6cb;
-        }
-
-        /* Modal Styles */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
-            align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            align-items: center;
+            z-index: 1000;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .modal-content {
-            background: white;
+            background: #fff;
             padding: 30px;
-            border-radius: 20px;
-            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: modalSlideIn 0.3s ease;
+            max-width: 500px;
+            text-align: right;
+            position: relative;
         }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-bottom: 3px solid #f8f9fa;
-            padding-bottom: 15px;
-        }
-
-        .modal-title {
-            margin: 0;
+        .modal-content h3 {
             color: #667eea;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .close-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            font-size: 20px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:hover {
-            background: #c82333;
-            transform: scale(1.1);
-        }
-
-        .admin-rank {
             margin-bottom: 20px;
-            padding: 15px;
-            background: #e7f3ff;
-            border-radius: 15px;
             text-align: center;
-            border: 3px solid #667eea;
         }
-
-        .rank-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border-right: 5px solid;
-            transition: transform 0.3s ease;
-        }
-
-        .rank-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .rank-item-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .rank-item-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .rank-item-icon {
+        .modal-content .close-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
             font-size: 24px;
+            color: #aaa;
+            cursor: pointer;
         }
-
-        .rank-item-details h4 {
-            margin: 0;
-            font-size: 16px;
+        .modal-content .close-btn:hover {
+            color: #333;
+        }
+        .leaderboard {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            text-align: right;
+        }
+        .leaderboard-item {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .leaderboard-item:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .leaderboard-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .user-info .position {
+            font-size: 1.4em;
             font-weight: bold;
-        }
-
-        .rank-item-details p {
-            margin: 5px 0 0 0;
-            font-size: 12px;
-            color: #6c757d;
-        }
-
-        .rank-item-points {
-            text-align: left;
             color: #667eea;
-            font-weight: bold;
-            font-size: 14px;
+            margin-left: 15px;
+            min-width: 50px;
+            text-align: center;
         }
-
+        .user-details h4 {
+            margin: 0 0 5px 0;
+            color: #4a5568;
+        }
+        .user-rank {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-points {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #38a169;
+        }
         .modal-tip {
             margin-top: 25px;
-            padding: 15px;
-            background: #d4edda;
-            border-radius: 15px;
-            text-align: center;
             font-size: 14px;
-            color: #155724;
-            border: 2px solid #c3e6cb;
+            color: #555;
+            text-align: center;
+            padding: 10px;
+            background: rgba(102, 122, 234, 0.1);
+            border-radius: 5px;
         }
-
-        .point-request-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        .login-form, .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .login-form input, .register-form input, #newPin, #requestedPoints {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .login-form button, .register-form button {
+            background-color: #38a169;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 15px;
+            padding: 12px 25px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            transition: all 0.3s ease;
-            min-width: 80px;
+            transition: background-color 0.3s ease;
         }
-
-        .point-request-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        .login-form button:hover, .register-form button:hover {
+            background-color: #2f855a;
         }
-
-        .point-request-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .message {
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
         }
-
-        .notification-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #667eea;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 1001;
-            animation: slideInRight 0.3s ease;
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(100%);
-            }
+        .admin-section {
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .section-header {
+            background-color: #edf2f7;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header h4 {
+            margin: 0;
+            color: #4a5568;
+            font-size: 1.1em;
+        }
+        .section-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+        .section-icon.rotated {
+            transform: rotate(90deg);
+        }
+        .section-content {
+            padding: 15px;
+            border-top: 1px solid #e2e8f0;
+            display: none; /* Hidden by default */
+        }
+        .section-content.expanded {
+            display: block; /* Shown when expanded */
+        }
+        .admin-btn {
+            background-color: #4299e1;
+        }
+        .admin-btn:hover {
+            background-color: #3182ce;
+        }
+        .card {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        textarea {
+            resize: vertical;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>منصة النقاط الذكية</h1>
-            <p>نظام إدارة النقاط والترتيب</p>
+        <h1>لوحة تحكم المستخدم</h1>
+
+        <div id="profileSection" class="user-info">
+            <h2 id="userName"></h2>
+            <div class="user-points" id="userPoints"></div>
         </div>
 
-        <div class="content">
-            <div id="message"></div>
+        <div id="authSection">
+            <div id="loginSection">
+                <h2>تسجيل الدخول</h2>
+                <form id="loginForm" class="login-form">
+                    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
+                    <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
+                    <button type="submit">دخول</button>
+                </form>
+                <p>ليس لديك حساب؟ <a href="#" id="showRegister">تسجيل جديد</a></p>
+            </div>
 
-            <!-- User Login Form -->
-            <div id="loginForm">
-                <div id="userLoginForm" class="user-login">
-                    <h2>🎯 مرحباً بك</h2>
-                    <form id="userLoginFormElement">
-                        <div class="input-group">
-                            <input type="text" id="userDisplayName" placeholder="اكتب اسمك هنا" required>
-                        </div>
-                        <button type="submit" class="user-login-btn">🚀 دخول</button>
-                    </form>
-                    <a href="#" onclick="showAdminLogin()" class="admin-link">إدارة النظام</a>
-                </div>
+            <div id="registerSection" style="display: none;">
+                <h2>التسجيل</h2>
+                <form id="registerForm" class="register-form">
+                    <input type="text" id="registerDisplayName" placeholder="اسم العرض" required>
+                    <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
+                    <input type="password" id="registerPassword" placeholder="كلمة المرور" required>
+                    <button type="submit">تسجيل</button>
+                </form>
+                <p>لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a></p>
+            </div>
+        </div>
 
-                <!-- Admin Login -->
-                <div id="adminLoginForm">
-                    <form id="adminLoginFormElement">
-                        <input type="email" id="adminEmail" placeholder="Email" required>
-                        <input type="password" id="adminPassword" placeholder="Password" required>
-                        <button type="submit">Login</button>
-                    </form>
-                    <p><a href="#" onclick="showUserLogin()">User</a></p>
+        <div id="mainSection" style="display: none;">
+            <button onclick="loadAllUsersPoints()" class="leaderboard-btn">عرض لوحة الترتيب 🏆</button>
+            <button onclick="refreshUserPoints()" class="leaderboard-btn">تحديث نقاطي 🔄</button>
+
+            <button onclick="logout()" class="logout-btn">تسجيل الخروج 👋</button>
                 </div>
             </div>
 
-            <!-- User Profile Section -->
-            <div id="profile" class="user-profile">
-                <div id="userInfo"></div>
-
-                <!-- All Users Points Section -->
-                <div id="allUsersPointsSection" style="display: none;">
-                    <div class="points-section">
-                        <div class="points-header">
-                            <h3 class="points-title">🏆 لوحة المتصدرين</h3>
-                        </div>
-                        <div id="allUsersPointsList"></div>
+            <!-- Point Request Section -->
+            <div id="pointRequestSection" style="display: none;">
+                <div class="card">
+                    <h3>طلب نقاط إضافية 🎯</h3>
+                    <div style="margin: 15px 0;">
+                        <label>عدد النقاط المطلوبة:</label>
+                        <input type="number" id="requestedPoints" min="1" max="100" placeholder="أدخل عدد النقاط">
                     </div>
+                    <div style="margin: 15px 0;">
+                        <label>سبب الطلب:</label>
+                        <textarea id="requestReason" placeholder="اشرح سبب طلب النقاط..." rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+                    </div>
+                    <button onclick="submitPointRequest()" class="admin-btn">إرسال الطلب</button>
+                    <div id="requestStatus" style="margin-top: 10px;"></div>
                 </div>
+            </div>
 
-                <!-- Admin Panel -->
-                <div id="adminPanel" style="display: none;" class="admin-panel">
-                    <h3>🔧 Admin Panel</h3>
+            <!-- Admin Section -->
+            <div id="adminSection" style="display: none;">
+                <div class="card">
+                    <h3>لوحة تحكم الإدارة 🛠️</h3>
 
-                    <!-- Users Overview Section -->
+                    <!-- PIN Management -->
                     <div class="admin-section">
-                        <div class="admin-section-header" onclick="toggleSection('usersOverview')">
-                            <h4>📊 Users Overview</h4>
-                            <span class="expand-icon" id="usersOverview-icon">▶</span>
+                        <div class="section-header" onclick="toggleSection('pin-management')">
+                            <span id="pin-management-icon" class="section-icon">▶</span>
+                            <h4>إدارة رقم PIN</h4>
                         </div>
-                        <div class="admin-section-content" id="usersOverview-content">
-                            <button onclick="loadAllUsers()" class="section-button">View All Users</button>
-                            <div id="usersList"></div>
-                        </div>
-                    </div>
-
-                    <!-- Create New User Section -->
-                    <div class="admin-section">
-                        <div class="admin-section-header" onclick="toggleSection('createUser')">
-                            <h4>➕ Create New User</h4>
-                            <span class="expand-icon" id="createUser-icon">▶</span>
-                        </div>
-                        <div class="admin-section-content" id="createUser-content">
-                            <form id="adminCreateUserForm">
-                                <input type="email" id="adminUserEmail" placeholder="User Email" required>
-                                <input type="text" id="adminUserDisplayName" placeholder="Display Name">
-                                <input type="password" id="adminUserPassword" placeholder="Password" required>
-                                <button type="submit" class="create-button">Create User</button>
-                            </form>
+                        <div id="pin-management-content" class="section-content">
+                            <div style="margin: 10px 0;">
+                                <label>تعيين رقم PIN جديد:</label>
+                                <input type="number" id="newPin" placeholder="أدخل رقم PIN (4 أرقام)" maxlength="4">
+                                <button onclick="setAdminPin()" class="admin-btn">تعيين PIN</button>
+                            </div>
+                            <div id="currentPin" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;"></div>
                         </div>
                     </div>
 
                     <!-- Point Requests Management -->
                     <div class="admin-section">
-                        <div class="admin-section-header" onclick="toggleSection('pointRequests')">
-                            <h4>🎯 Point Requests <span id="requestNotification" style="background: #dc3545; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; margin-left: 10px; display: none;"></span></h4>
-                            <span class="expand-icon" id="pointRequests-icon">▶</span>
+                        <div class="section-header" onclick="toggleSection('point-requests')">
+                            <span id="point-requests-icon" class="section-icon">▶</span>
+                            <h4>طلبات النقاط المعلقة</h4>
                         </div>
-                        <div class="admin-section-content" id="pointRequests-content">
-                            <button onclick="loadPointRequests()" class="section-button">🔄 Refresh Requests</button>
-                            <div id="pointRequestsList"></div>
-                        </div>
-                    </div>
-
-                    <!-- User Management Section -->
-                    <div class="admin-section">
-                        <div class="admin-section-header" onclick="toggleSection('userManagement')">
-                            <h4>👤 User Management</h4>
-                            <span class="expand-icon" id="userManagement-icon">▶</span>
-                        </div>
-                        <div class="admin-section-content" id="userManagement-content">
-                            <!-- Update Points -->
-                            <div class="admin-subsection">
-                                <h5>🎯 Update User Points</h5>
-                                <form id="updatePointsByNameForm">
-                                    <input type="text" id="pointsUserDisplayName" placeholder="Display Name" required>
-                                    <input type="number" id="newPointsByName" placeholder="New Points" required min="0">
-                                    <button type="submit" class="update-button">Update Points</button>
-                                </form>
-                            </div>
-
-                            <!-- Update Display Name -->
-                            <div class="admin-subsection">
-                                <h5>✏️ Change Display Name</h5>
-                                <form id="updateDisplayNameForm">
-                                    <input type="text" id="currentDisplayName" placeholder="Current Display Name" required>
-                                    <input type="text" id="newDisplayName" placeholder="New Display Name" required>
-                                    <button type="submit" class="update-button">Update Display Name</button>
-                                </form>
-                            </div>
-
-                            <!-- Delete User -->
-                            <div class="admin-subsection">
-                                <h5>🗑️ Delete User</h5>
-                                <form id="deleteUserForm">
-                                    <input type="text" id="deleteUserDisplayName" placeholder="Display Name to Delete" required>
-                                    <button type="submit" class="delete-button">Delete User</button>
-                                </form>
-                            </div>
+                        <div id="point-requests-content" class="section-content">
+                            <button onclick="loadPointRequests()" class="admin-btn">تحديث الطلبات</button>
+                            <div id="pointRequestsList" style="margin-top: 15px;"></div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <button onclick="logout()" class="logout-btn">🚪 خروج</button>
+            <!-- All Users Section -->
+            <div id="allUsersSection" style="display: none;">
+                <div class="card">
+                    <h3>جميع المستخدمين</h3>
+                    <div id="usersList"></div>
+                </div>
+            </div>
+
+            <!-- User Points Display Section -->
+            <div id="userPointsSection" style="display: none;">
+                <div class="card">
+                    <h3>نقاط المستخدمين</h3>
+                    <div id="allUsersPointsList"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where, deleteDoc, updateDoc, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-        // Firebase configuration
+    <script>
+        // Firebase Configuration (Replace with your actual Firebase config)
         const firebaseConfig = {
-            apiKey: "AIzaSyB5pkNdm8ik_Fd2p13QElfVXWMZjJxqKBk",
-            authDomain: "owner-523c8.firebaseapp.com",
-            projectId: "owner-523c8",
-            storageBucket: "owner-523c8.firebasestorage.app",
-            messagingSenderId: "414224069376",
-            appId: "1:414224069376:web:6030d9f7b6b4a61e3a39e5",
-            measurementId: "G-5VBY5ZM24S"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         let currentUser = null;
         let isAdmin = false;
 
-        // Show message
-        function showMessage(message, type = 'success') {
-            const messageDiv = document.getElementById('message');
-            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
-            setTimeout(() => {
-                messageDiv.innerHTML = '';
-            }, 5000);
-        }
+        // Get DOM elements
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegisterLink = document.getElementById('showRegister');
+        const showLoginLink = document.getElementById('showLogin');
+        const profileSection = document.getElementById('profileSection');
+        const userNameDisplay = document.getElementById('userName');
+        const userPointsDisplay = document.getElementById('userPoints');
+        const authSection = document.getElementById('authSection');
+        const mainSection = document.getElementById('mainSection');
+        const adminSection = document.getElementById('adminSection');
+        const pointRequestSection = document.getElementById('pointRequestSection');
+        const requestedPointsInput = document.getElementById('requestedPoints');
+        const requestReasonInput = document.getElementById('requestReason');
+        const requestStatusDisplay = document.getElementById('requestStatus');
+        const newPinInput = document.getElementById('newPin');
+        const currentPinDisplay = document.getElementById('currentPin');
 
-        // Show login form
-        window.showLogin = function() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('profile').style.display = 'none';
-        }
+        // Authentication
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('registerSection').style.display = 'block';
+        });
 
-        // Arabic ranking system
-        function getRankInfo(points, isAdminUser = false) {
-            if (isAdminUser) {
-                return {
-                    name: 'المدير',
-                    nameEn: 'Admin',
-                    color: '#dc3545',
-                    icon: '👑',
-                    minPoints: 0
-                };
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('registerSection').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                await loadUserData();
+                showMessage('تم تسجيل الدخول بنجاح!');
+            } catch (error) {
+                showMessage(error.message, 'error');
             }
+        });
 
-            const ranks = [
-                { name: 'مبتدئ', nameEn: 'Beginner', color: '#6c757d', icon: '🥉', minPoints: 0 },
-                { name: 'متدرب', nameEn: 'Trainee', color: '#17a2b8', icon: '📚', minPoints: 50 },
-                { name: 'متقدم', nameEn: 'Advanced', color: '#28a745', icon: '⭐', minPoints: 150 },
-                { name: 'خبير', nameEn: 'Expert', color: '#ffc107', icon: '🏆', minPoints: 300 },
-                { name: 'محترف', nameEn: 'Professional', color: '#fd7e14', icon: '💎', minPoints: 500 },
-                { name: 'ماهر', nameEn: 'Master', color: '#e83e8c', icon: '🔥', minPoints: 750 },
-                { name: 'أسطورة', nameEn: 'Legend', color: '#6f42c1', icon: '⚡', minPoints: 1000 },
-                { name: 'بطل', nameEn: 'Champion', color: '#dc3545', icon: '👑', minPoints: 1500 }
-            ];
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const displayName = document.getElementById('registerDisplayName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
 
-            let currentRank = ranks[0];
-            for (let i = ranks.length - 1; i >= 0; i--) {
-                if (points >= ranks[i].minPoints) {
-                    currentRank = ranks[i];
-                    break;
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+
+                await db.collection('users').doc(currentUser.uid).set({
+                    uid: currentUser.uid,
+                    email: email,
+                    displayName: displayName,
+                    points: 0,
+                    isAdmin: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await auth.currentUser.updateProfile({ displayName: displayName });
+
+                localStorage.setItem('userSession', JSON.stringify({ uid: currentUser.uid, email: currentUser.email, displayName: displayName, points: 0, isAdmin: false }));
+                showProfile(currentUser, 0);
+                mainSection.style.display = 'block';
+                authSection.style.display = 'none';
+                showMessage('تم إنشاء الحساب بنجاح!');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+
+        // Load user data from Firestore
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    currentUser = { ...currentUser, ...userData };
+                    isAdmin = userData.isAdmin || false;
+                    showProfile(currentUser);
+                    toggleSections();
+                    localStorage.setItem('userSession', JSON.stringify(userData));
+                } else {
+                    // User might not exist in Firestore yet (e.g., first login after registration)
+                    await db.collection('users').doc(currentUser.uid).set({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        displayName: currentUser.displayName || currentUser.email.split('@')[0],
+                        points: 0,
+                        isAdmin: false,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    currentUser = { ...currentUser, displayName: currentUser.displayName || currentUser.email.split('@')[0], points: 0, isAdmin: false };
+                    isAdmin = false;
+                    showProfile(currentUser);
+                    toggleSections();
+                    localStorage.setItem('userSession', JSON.stringify({ uid: currentUser.uid, email: currentUser.email, displayName: currentUser.displayName, points: 0, isAdmin: false }));
                 }
+            } catch (error) {
+                showMessage('خطأ في تحميل بيانات المستخدم: ' + error.message, 'error');
             }
-
-            const currentIndex = ranks.findIndex(rank => rank.name === currentRank.name);
-            const nextRank = currentIndex < ranks.length - 1 ? ranks[currentIndex + 1] : null;
-            const pointsToNext = nextRank ? nextRank.minPoints - points : 0;
-
-            return {
-                ...currentRank,
-                nextRank,
-                pointsToNext,
-                progress: nextRank ? ((points - currentRank.minPoints) / (nextRank.minPoints - currentRank.minPoints)) * 100 : 100
-            };
         }
 
-        // Show profile
-        async function showProfile(user) {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('profile').style.display = 'block';
-
-            isAdmin = user.email === 'mahmod@gmail.com';
-            const rankInfo = getRankInfo(user.points || 0, isAdmin);
-
-            if (isAdmin) {
-                // Admin view
-                document.getElementById('userInfo').innerHTML = `
-                    <div class="profile-card">
-                        <div class="profile-name">
-                            <span>👑</span>
-                            <span>${user.displayName || 'المدير'}</span>
-                        </div>
-                        <div class="points-display">
-                            <span>💰</span>
-                            <span id="userPoints">${user.points || 0} نقطة</span>
-                            <button onclick="refreshUserPoints()" class="refresh-btn">🔄</button>
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-size: 18px;">
-                            <span style="font-size: 24px;">${rankInfo.icon}</span>
-                            <span style="color: white; font-weight: bold;">${rankInfo.name}</span>
-                            <span style="color: white; font-size: 14px;">(${rankInfo.nameEn})</span>
-                        </div>
-                    </div>
-                `;
-
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('allUsersPointsSection').style.display = 'none';
+        // Show profile information
+        function showProfile(user) {
+            if (user) {
+                userNameDisplay.textContent = user.displayName || 'مستخدم';
+                userPointsDisplay.textContent = `${user.points || 0} نقطة`;
+                profileSection.style.display = 'flex';
             } else {
-                // User view
-                document.getElementById('userInfo').innerHTML = `
-                    <div class="profile-card">
-                        <div class="profile-name">
-                            <span>👤</span>
-                            <span>${user.displayName || 'لم يتم تعيين الاسم'}</span>
-                        </div>
-                        <div class="points-display">
-                            <span>💰</span>
-                            <span id="userPoints">${user.points || 0} نقطة</span>
-                            <button onclick="refreshUserPoints()" class="refresh-btn">🔄</button>
-                        </div>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; font-size: 18px;">
-                            <span style="font-size: 24px;">${rankInfo.icon}</span>
-                            <span style="color: white; font-weight: bold;">${rankInfo.name}</span>
-                            <span style="color: white; font-size: 14px;">(${rankInfo.nameEn})</span>
-                        </div>
-                    </div>
+                profileSection.style.display = 'none';
+            }
+        }
 
-                    <div class="rank-card">
-                        <div class="rank-header">
-                            <div style="text-align: center; width: 100%;">
-                                <h3 style="color: #667eea; margin: 0 0 15px 0;">معلومات الرتبة</h3>
-                            </div>
-                            <button onclick="showRankingSystem()" class="rank-button">📊 جميع الرتب</button>
-                        </div>
-
-                        ${rankInfo.nextRank ? `
-                            <div class="progress-section">
-                                <div class="progress-info">
-                                    <span>التقدم للرتبة التالية: ${rankInfo.nextRank.name}</span>
-                                    <span>${rankInfo.pointsToNext} نقطة متبقية</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${Math.min(rankInfo.progress, 100)}%; background: linear-gradient(90deg, ${rankInfo.color}, ${rankInfo.nextRank.color});"></div>
-                                </div>
-                            </div>
-                        ` : `
-                            <div class="max-rank">
-                                🎉 تهانينا! لقد وصلت لأعلى رتبة! 🎉
-                            </div>
-                        `}
-                    </div>
-                `;
-
-                document.getElementById('adminPanel').style.display = 'none';
-                document.getElementById('allUsersPointsSection').style.display = 'block';
-                loadAllUsersPoints();
+        // Toggle sections based on user role
+        function toggleSections() {
+            if (currentUser) {
+                authSection.style.display = 'none';
+                mainSection.style.display = 'block';
+                if (isAdmin) {
+                    adminSection.style.display = 'block';
+                    pointRequestSection.style.display = 'none'; // Hide for admin
+                } else {
+                    adminSection.style.display = 'none';
+                    pointRequestSection.style.display = 'block'; // Show for users
+                }
+            } else {
+                authSection.style.display = 'block';
+                mainSection.style.display = 'none';
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('registerSection').style.display = 'none';
+                document.getElementById('allUsersSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'none';
+                document.getElementById('pointRequestSection').style.display = 'none';
             }
         }
 
@@ -1136,468 +550,298 @@
         function checkSavedSession() {
             const savedSession = localStorage.getItem('userSession');
             if (savedSession) {
-                try {
-                    const userData = JSON.parse(savedSession);
-                    currentUser = userData;
-                    showProfile(userData);
-                    return true;
-                } catch (error) {
-                    localStorage.removeItem('userSession');
-                }
+                const sessionData = JSON.parse(savedSession);
+                currentUser = {
+                    uid: sessionData.uid,
+                    email: sessionData.email,
+                    displayName: sessionData.displayName,
+                    points: sessionData.points,
+                    isAdmin: sessionData.isAdmin
+                };
+                isAdmin = sessionData.isAdmin;
+                showProfile(currentUser);
+                toggleSections();
+                return true;
             }
             return false;
         }
 
-        // Auth state observer
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                localStorage.removeItem('userSession');
+        // Show message
+        function showMessage(msg, type = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = msg;
+            document.getElementById('authSection').prepend(messageDiv);
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
 
-                try {
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
-                    const userData = userDoc.exists() ? userDoc.data() : {};
+        // Show login page
+        function showLogin() {
+            authSection.style.display = 'block';
+            mainSection.style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('registerSection').style.display = 'none';
+            document.getElementById('allUsersSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('pointRequestSection').style.display = 'none';
+            currentUser = null;
+            isAdmin = false;
+        }
 
-                    const userInfo = {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: userData.displayName || '',
-                        points: userData.points || 0
-                    };
-
-                    showProfile(userInfo);
-                } catch (error) {
-                    showProfile({
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: '',
-                        points: 0
-                    });
-                }
-            } else {
-                if (!checkSavedSession()) {
-                    currentUser = null;
-                    showLogin();
-                }
+        // Submit Point Request
+        window.submitPointRequest = async function() {
+            if (!currentUser) {
+                showMessage('Please log in to submit a request.', 'error');
+                return;
             }
-        });
 
-        // Show admin/user login forms
-        window.showAdminLogin = function() {
-            document.getElementById('userLoginForm').style.display = 'none';
-            document.getElementById('adminLoginForm').style.display = 'block';
-        }
+            const requestedPoints = parseInt(requestedPointsInput.value);
+            const requestReason = requestReasonInput.value.trim();
 
-        window.showUserLogin = function() {
-            document.getElementById('adminLoginForm').style.display = 'none';
-            document.getElementById('userLoginForm').style.display = 'block';
-        }
+            if (isNaN(requestedPoints) || requestedPoints < 1 || requestedPoints > 100) {
+                requestStatusDisplay.textContent = 'Please enter a valid number of points between 1 and 100.';
+                requestStatusDisplay.style.color = 'red';
+                return;
+            }
 
-        // User login (display name only)
-        document.getElementById('userLoginFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const displayName = document.getElementById('userDisplayName').value.trim();
-
-            if (!displayName) {
-                showMessage('يرجى إدخال اسم عرض.', 'error');
+            if (!requestReason) {
+                requestStatusDisplay.textContent = 'Please provide a reason for your request.';
+                requestStatusDisplay.style.color = 'red';
                 return;
             }
 
             try {
-                const usersRef = collection(db, 'users');
-                const q = query(usersRef, where('displayName', '==', displayName));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    showMessage('المستخدم غير موجود.', 'error');
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
-
-                if (userData.email === 'mahmod@gmail.com') {
-                    showMessage('المدير يجب أن يسجل دخول بالإيميل وكلمة المرور', 'error');
-                    return;
-                }
-
-                const userInfo = {
-                    uid: userData.uid,
-                    email: userData.email,
-                    displayName: userData.displayName,
-                    points: userData.points || 0
-                };
-
-                localStorage.setItem('userSession', JSON.stringify(userInfo));
-                currentUser = userInfo;
-                showProfile(userInfo);
-                showMessage('تم تسجيل الدخول بنجاح! 🎉');
-            } catch (error) {
-                showMessage('خطأ في تسجيل الدخول: ' + error.message, 'error');
-            }
-        });
-
-        // Admin login
-        document.getElementById('adminLoginFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                showMessage('Admin login successful!');
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
-        });
-
-        // Admin create user
-        document.getElementById('adminCreateUserForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            const email = document.getElementById('adminUserEmail').value;
-            const password = document.getElementById('adminUserPassword').value;
-            const displayName = document.getElementById('adminUserDisplayName').value.trim();
-
-            try {
-                // Check if display name exists
-                if (displayName) {
-                    const usersRef = collection(db, 'users');
-                    const q = query(usersRef, where('displayName', '==', displayName));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        showMessage('Display name already exists.', 'error');
-                        return;
-                    }
-                }
-
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                await setDoc(doc(db, 'users', user.uid), {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: displayName || '',
-                    points: 1,
-                    pin: null,
-                    createdAt: new Date().toISOString()
+                await db.collection('pointRequests').add({
+                    userId: currentUser.uid,
+                    displayName: currentUser.displayName,
+                    requestedPoints: requestedPoints,
+                    reason: requestReason,
+                    status: 'pending',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
-                showMessage('User created successfully!');
-                document.getElementById('adminCreateUserForm').reset();
-
-                if (document.getElementById('usersList').innerHTML) {
-                    loadAllUsers();
-                }
+                requestStatusDisplay.textContent = 'Your request has been submitted successfully!';
+                requestStatusDisplay.style.color = 'green';
+                requestedPointsInput.value = '';
+                requestReasonInput.value = '';
             } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
-            }
-        });
-
-        // Update points by name
-        document.getElementById('updatePointsByNameForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            const displayName = document.getElementById('pointsUserDisplayName').value.trim();
-            const points = parseInt(document.getElementById('newPointsByName').value);
-
-            try {
-                const usersRef = collection(db, 'users');
-                const q = query(usersRef, where('displayName', '==', displayName));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    showMessage('User not found.', 'error');
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                await updateDoc(doc(db, 'users', userDoc.id), {
-                    points: points,
-                    updatedAt: new Date().toISOString()
-                });
-
-                showMessage('Points updated successfully!');
-                document.getElementById('updatePointsByNameForm').reset();
-
-                if (document.getElementById('usersList').innerHTML) {
-                    loadAllUsers();
-                }
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
-            }
-        });
-
-        // Update display name
-        document.getElementById('updateDisplayNameForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            const currentDisplayName = document.getElementById('currentDisplayName').value.trim();
-            const newDisplayName = document.getElementById('newDisplayName').value.trim();
-
-            try {
-                // Check if new name exists
-                const usersRef = collection(db, 'users');
-                const newNameQuery = query(usersRef, where('displayName', '==', newDisplayName));
-                const newNameSnapshot = await getDocs(newNameQuery);
-
-                if (!newNameSnapshot.empty) {
-                    const existingUser = newNameSnapshot.docs[0].data();
-                    if (existingUser.displayName !== currentDisplayName) {
-                        showMessage('New display name already exists.', 'error');
-                        return;
-                    }
-                }
-
-                // Find current user
-                const currentNameQuery = query(usersRef, where('displayName', '==', currentDisplayName));
-                const currentNameSnapshot = await getDocs(currentNameQuery);
-
-                if (currentNameSnapshot.empty) {
-                    showMessage('User not found.', 'error');
-                    return;
-                }
-
-                const userDoc = currentNameSnapshot.docs[0];
-                await updateDoc(doc(db, 'users', userDoc.id), {
-                    displayName: newDisplayName,
-                    updatedAt: new Date().toISOString()
-                });
-
-                showMessage('Display name updated successfully!');
-                document.getElementById('updateDisplayNameForm').reset();
-
-                if (document.getElementById('usersList').innerHTML) {
-                    loadAllUsers();
-                }
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
-            }
-        });
-
-        // Delete user
-        document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            const targetDisplayName = document.getElementById('deleteUserDisplayName').value.trim();
-
-            if (!confirm(`Delete user "${targetDisplayName}"?`)) {
-                return;
-            }
-
-            try {
-                const usersRef = collection(db, 'users');
-                const q = query(usersRef, where('displayName', '==', targetDisplayName));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    showMessage('User not found.', 'error');
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
-
-                if (userData.email === 'mahmod@gmail.com') {
-                    showMessage('Cannot delete admin account.', 'error');
-                    return;
-                }
-
-                await deleteDoc(doc(db, 'users', userDoc.id));
-
-                showMessage('User deleted successfully!');
-                document.getElementById('deleteUserForm').reset();
-
-                if (document.getElementById('usersList').innerHTML) {
-                    loadAllUsers();
-                }
-            } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
-            }
-        });
-
-        // Load all users (admin)
-        window.loadAllUsers = async function() {
-            if (!isAdmin) {
-                showMessage('Access denied.', 'error');
-                return;
-            }
-
-            try {
-                const usersRef = collection(db, 'users');
-                const querySnapshot = await getDocs(usersRef);
-
-                const users = [];
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    if (userData.email && userData.email !== 'undefined') {
-                        users.push({
-                            id: doc.id,
-                            ...userData
-                        });
-                    }
-                });
-
-                const filteredUsers = users.filter(user => user.email !== 'mahmod@gmail.com');
-
-                const usersList = document.getElementById('usersList');
-                usersList.innerHTML = `
-                    <h4>All Users (${filteredUsers.length})</h4>
-                    <div style="margin-bottom: 15px;">
-                        <input type="text" id="searchDisplayName" placeholder="Search by display name..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;" oninput="filterUsers()">
-                    </div>
-                    <div id="filteredUsersList">
-                        ${filteredUsers.map(user => `
-                            <div class="user-item" data-display-name="${(user.displayName || '').toLowerCase()}">
-                                <strong>User:</strong> ${user.displayName || 'No display name'} (${user.email})<br>
-                                <strong>Points:</strong> 
-                                <span id="points-${user.uid}">${user.points || 0}</span>
-                                <input type="number" id="edit-points-${user.uid}" value="${user.points || 0}" min="0" style="display: none; width: 80px; margin-left: 5px;">
-                                <button onclick="editPoints('${user.uid}', '${user.displayName}')" id="edit-btn-${user.uid}" style="margin-left: 10px; padding: 2px 8px; font-size: 12px;" class="update-button">Edit</button>
-                                <button onclick="savePoints('${user.uid}', '${user.displayName}')" id="save-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;" class="create-button">Save</button>
-                                <button onclick="cancelEditPoints('${user.uid}')" id="cancel-btn-${user.uid}" style="display: none; margin-left: 5px; padding: 2px 8px; font-size: 12px;">Cancel</button>
-                                <button onclick="deleteUser('${user.displayName || user.email}')" class="delete-button" style="margin-left: 10px;">Delete</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            } catch (error) {
-                showMessage('Error loading users: ' + error.message, 'error');
+                requestStatusDisplay.textContent = 'Error submitting request: ' + error.message;
+                requestStatusDisplay.style.color = 'red';
             }
         }
 
-        // Filter users
-        window.filterUsers = function() {
-            const searchTerm = document.getElementById('searchDisplayName').value.toLowerCase();
-            const userItems = document.querySelectorAll('#filteredUsersList .user-item');
-            let visibleCount = 0;
-
-            userItems.forEach(item => {
-                const displayName = item.getAttribute('data-display-name');
-                if (displayName.includes(searchTerm)) {
-                    item.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            const header = document.querySelector('#usersList h4');
-            if (header) {
-                const totalUsers = userItems.length;
-                if (searchTerm) {
-                    header.textContent = `All Users (${visibleCount}/${totalUsers})`;
-                } else {
-                    header.textContent = `All Users (${totalUsers})`;
-                }
-            }
-        }
-
-        // Edit points inline
-        window.editPoints = function(userId, displayName) {
-            const pointsSpan = document.getElementById(`points-${userId}`);
-            const editInput = document.getElementById(`edit-points-${userId}`);
-            const editBtn = document.getElementById(`edit-btn-${userId}`);
-            const saveBtn = document.getElementById(`save-btn-${userId}`);
-            const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
-
-            pointsSpan.style.display = 'none';
-            editInput.style.display = 'inline';
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'inline';
-            cancelBtn.style.display = 'inline';
-            editInput.focus();
-        }
-
-        // Save points inline
-        window.savePoints = async function(userId, displayName) {
+        // Load point requests for admin
+        window.loadPointRequests = async function() {
             if (!isAdmin) return;
 
-            const editInput = document.getElementById(`edit-points-${userId}`);
-            const newPoints = parseInt(editInput.value);
+            const pointRequestsList = document.getElementById('pointRequestsList');
+            pointRequestsList.innerHTML = 'Loading requests...';
 
             try {
-                await updateDoc(doc(db, 'users', userId), {
-                    points: newPoints,
-                    updatedAt: new Date().toISOString()
+                const snapshot = await db.collection('pointRequests').orderBy('timestamp', 'desc').get();
+                if (snapshot.empty) {
+                    pointRequestsList.innerHTML = 'No pending requests.';
+                    return;
+                }
+
+                let requestsHtml = '';
+                snapshot.forEach(doc => {
+                    const request = doc.data();
+                    const id = doc.id;
+                    requestsHtml += `
+                        <div class="card" style="margin-bottom: 15px; padding: 15px;">
+                            <p><strong>User:</strong> ${request.displayName || 'N/A'}</p>
+                            <p><strong>Points Requested:</strong> ${request.requestedPoints}</p>
+                            <p><strong>Reason:</strong> ${request.reason}</p>
+                            <p><strong>Status:</strong> ${request.status === 'pending' ? 'Pending' : request.status}</p>
+                            ${request.status === 'pending' ? `
+                                <button onclick="approvePointRequest('${id}', ${request.requestedPoints}, '${request.userId}')" class="admin-btn" style="background-color: #38a169; margin-right: 5px;">Approve</button>
+                                <button onclick="rejectPointRequest('${id}')" class="admin-btn" style="background-color: #e53e3e;">Reject</button>
+                            ` : ''}
+                        </div>
+                    `;
                 });
-
-                showMessage('Points updated successfully!');
-
-                const pointsSpan = document.getElementById(`points-${userId}`);
-                const editBtn = document.getElementById(`edit-btn-${userId}`);
-                const saveBtn = document.getElementById(`save-btn-${userId}`);
-                const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
-
-                pointsSpan.textContent = newPoints;
-                pointsSpan.style.display = 'inline';
-                editInput.style.display = 'none';
-                editBtn.style.display = 'inline';
-                saveBtn.style.display = 'none';
-                cancelBtn.style.display = 'none';
+                pointRequestsList.innerHTML = requestsHtml;
             } catch (error) {
-                showMessage('Error updating points: ' + error.message, 'error');
+                pointRequestsList.innerHTML = 'Error loading requests.';
+                console.error("Error loading point requests: ", error);
             }
         }
 
-        // Cancel edit points
-        window.cancelEditPoints = function(userId) {
-            const pointsSpan = document.getElementById(`points-${userId}`);
-            const editInput = document.getElementById(`edit-points-${userId}`);
-            const editBtn = document.getElementById(`edit-btn-${userId}`);
-            const saveBtn = document.getElementById(`save-btn-${userId}`);
-            const cancelBtn = document.getElementById(`cancel-btn-${userId}`);
+        // Approve point request
+        window.approvePointRequest = async function(requestId, pointsToAdd, userId) {
+            if (!isAdmin) return;
 
-            editInput.value = pointsSpan.textContent;
+            try {
+                // Update request status
+                await db.collection('pointRequests').doc(requestId).update({ status: 'approved' });
 
-            pointsSpan.style.display = 'inline';
-            editInput.style.display = 'none';
-            editBtn.style.display = 'inline';
-            saveBtn.style.display = 'none';
-            cancelBtn.style.display = 'none';
+                // Add points to user
+                const userRef = db.collection('users').doc(userId);
+                await userRef.update({
+                    points: firebase.firestore.FieldValue.increment(pointsToAdd)
+                });
+
+                // Refresh user data and display
+                const updatedUserDoc = await userRef.get();
+                const userData = updatedUserDoc.data();
+                currentUser.points = userData.points;
+                showProfile(currentUser);
+
+                loadPointRequests(); // Reload requests
+                showMessage('Point request approved and points added!');
+            } catch (error) {
+                console.error("Error approving point request: ", error);
+                showMessage('Error approving request: ' + error.message, 'error');
+            }
         }
 
-        // Show ranking system
-        window.showRankingSystem = async function() {
-            const ranks = [
-                { name: 'مبتدئ', nameEn: 'Beginner', color: '#6c757d', icon: '🥉', minPoints: 0 },
-                { name: 'متدرب', nameEn: 'Trainee', color: '#17a2b8', icon: '📚', minPoints: 50 },
-                { name: 'متقدم', nameEn: 'Advanced', color: '#28a745', icon: '⭐', minPoints: 150 },
-                { name: 'خبير', nameEn: 'Expert', color: '#ffc107', icon: '🏆', minPoints: 300 },
-                { name: 'محترف', nameEn: 'Professional', color: '#fd7e14', icon: '💎', minPoints: 500 },
-                { name: 'ماهر', nameEn: 'Master', color: '#e83e8c', icon: '🔥', minPoints: 750 },
-                { name: 'أسطورة', nameEn: 'Legend', color: '#6f42c1', icon: '⚡', minPoints: 1000 },
-                { name: 'بطل', nameEn: 'Champion', color: '#dc3545', icon: '👑', minPoints: 1500 }
-            ];
+        // Reject point request
+        window.rejectPointRequest = async function(requestId) {
+            if (!isAdmin) return;
 
-            let usersData = [];
+            try {
+                await db.collection('pointRequests').doc(requestId).update({ status: 'rejected' });
+                loadPointRequests(); // Reload requests
+                showMessage('Point request rejected.');
+            } catch (error) {
+                console.error("Error rejecting point request: ", error);
+                showMessage('Error rejecting request: ' + error.message, 'error');
+            }
+        }
+
+        // Set Admin PIN
+        window.setAdminPin = async function() {
+            if (!isAdmin) {
+                showMessage('Access denied.', 'error');
+                return;
+            }
+
+            const newPin = newPinInput.value.trim();
+            if (!/^\d{4}$/.test(newPin)) {
+                showMessage('PIN must be exactly 4 digits.', 'error');
+                return;
+            }
+
+            try {
+                await db.collection('adminSettings').doc('pin').set({ pin: newPin });
+                showMessage('Admin PIN set successfully!');
+                newPinInput.value = '';
+                displayCurrentPin();
+            } catch (error) {
+                showMessage('Error setting PIN: ' + error.message, 'error');
+            }
+        }
+
+        // Display current admin PIN
+        async function displayCurrentPin() {
+            if (!isAdmin) return;
+            try {
+                const doc = await db.collection('adminSettings').doc('pin').get();
+                if (doc.exists) {
+                    currentPinDisplay.textContent = `Current PIN: ${doc.data().pin}`;
+                } else {
+                    currentPinDisplay.textContent = 'No PIN set yet.';
+                }
+            } catch (error) {
+                currentPinDisplay.textContent = 'Error fetching PIN.';
+                console.error("Error fetching PIN: ", error);
+            }
+        }
+
+        // Load all users for admin view
+        window.loadAllUsers = async function() {
+            if (!isAdmin) return;
+
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = 'Loading users...';
+
+            try {
+                const snapshot = await db.collection('users').orderBy('displayName').get();
+                if (snapshot.empty) {
+                    usersList.innerHTML = 'No users found.';
+                    return;
+                }
+
+                let usersHtml = '<div class="leaderboard">';
+                snapshot.forEach((doc, index) => {
+                    const user = doc.data();
+                    const isCurrentUserAdmin = user.email === 'mahmod@gmail.com'; // Assuming 'mahmod@gmail.com' is the admin
+                    const rankInfo = getRankInfo(user.points || 0, isCurrentUserAdmin);
+                    const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+                    const positionColor = positionColors[index] || '#17a2b8';
+
+                    usersHtml += `
+                        <div class="leaderboard-item" style="border-right-color: ${positionColor};">
+                            <div class="leaderboard-content">
+                                <div class="user-info">
+                                    <div class="position">
+                                        ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
+                                    </div>
+                                    <div class="user-details">
+                                        <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
+                                        <div class="user-rank">
+                                            <span style="font-size: 18px;">${rankInfo.icon}</span>
+                                            <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
+                                        </div>
+                                        <small>${user.email}</small>
+                                    </div>
+                                </div>
+                                <div class="user-points">
+                                    ${user.points || 0} نقطة
+                                    ${isAdmin ? `<button onclick="deleteUser('${user.email}')" class="action-btn" style="background-color: #e53e3e; font-size: 12px; padding: 5px 10px; margin-left: 10px;">Delete</button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                usersHtml += '</div>';
+                usersList.innerHTML = usersHtml;
+            } catch (error) {
+                usersList.innerHTML = 'Error loading users.';
+                console.error("Error loading users: ", error);
+            }
+        }
+
+
+        // Function to get rank based on points
+        function getRankInfo(points, isAdminUser) {
+            if (isAdminUser) {
+                return { name: 'Admin', icon: '👑', color: '#e53e3e' };
+            }
+            if (points >= 1000) return { name: 'Master', icon: '💎', color: '#50e3c2' };
+            if (points >= 750) return { name: 'Gold', icon: '⭐', color: '#f6e05e' };
+            if (points >= 500) return { name: 'Silver', icon: '🌙', color: '#a0aec0' };
+            if (points >= 250) return { name: 'Bronze', icon: '🥉', color: '#dd6b20' };
+            return { name: 'Rookie', icon: '🌱', color: '#48bb78' };
+        }
+
+        // Show leaderboard modal
+        window.showLeaderboardModal = function() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-btn" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <h3>لوحة الترتيب العالمية</h3>
+                    <div id="leaderboardContent"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            loadLeaderboard(modal);
+        }
+
+        // Load leaderboard data
+        async function loadLeaderboard(modal) {
+            const leaderboardContent = modal.querySelector('#leaderboardContent');
+            leaderboardContent.innerHTML = 'Loading leaderboard...';
+
             try {
                 const usersRef = collection(db, 'users');
                 const querySnapshot = await getDocs(usersRef);
 
+                let usersData = [];
                 querySnapshot.forEach((doc) => {
                     const userData = doc.data();
                     if (userData.email && userData.email !== 'undefined') {
@@ -1606,93 +850,54 @@
                 });
 
                 usersData.sort((a, b) => (b.points || 0) - (a.points || 0));
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            }
 
-            const modal = document.createElement('div');
-            modal.className = 'modal';
+                let leaderboardHtml = '<div class="leaderboard">';
+                usersData.forEach((user, index) => {
+                    const isAdminUser = user.email === 'mahmod@gmail.com';
+                    const rankInfo = getRankInfo(user.points || 0, isAdminUser);
+                    const positionColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+                    const positionColor = positionColors[index] || '#17a2b8';
 
-            modal.innerHTML = `
-                <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
-                    <div class="modal-header">
-                        <h3 class="modal-title">🏆 نظام الرتب</h3>
-                        <button onclick="this.closest('.modal').remove()" class="close-btn">×</button>
-                    </div>
-
-                    <div class="admin-rank">
-                        <div style="font-size: 32px; margin-bottom: 10px;">👑</div>
-                        <div style="font-weight: bold; color: #dc3545; font-size: 20px;">المدير</div>
-                        <div style="font-size: 14px; color: #6c757d;">Admin - رتبة خاصة</div>
-                        ${usersData.filter(user => user.email === 'mahmod@gmail.com').map(admin => `
-                            <div style="margin-top: 10px; padding: 8px; background: rgba(220, 53, 69, 0.1); border-radius: 8px;">
-                                <div style="font-weight: bold; color: #dc3545;">${admin.displayName || 'المدير'}</div>
-                                <div style="font-size: 12px; color: #666;">${admin.points || 0} نقطة</div>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    ${ranks.map((rank, index) => {
-                        const nextRank = ranks[index + 1];
-                        const playersInRank = usersData.filter(user => {
-                            if (user.email === 'mahmod@gmail.com') return false;
-                            const userPoints = user.points || 0;
-                            const minPoints = rank.minPoints;
-                            const maxPoints = nextRank ? nextRank.minPoints - 1 : Infinity;
-                            return userPoints >= minPoints && userPoints <= maxPoints;
-                        });
-
-                        return `
-                            <div class="rank-item" style="border-right-color: ${rank.color};">
-                                <div class="rank-item-content">
-                                    <div class="rank-item-info">
-                                        <span class="rank-item-icon">${rank.icon}</span>
-                                        <div class="rank-item-details">
-                                            <h4 style="color: ${rank.color};">${rank.name}</h4>
-                                            <p>${rank.nameEn}</p>
+                    leaderboardHtml += `
+                        <div class="leaderboard-item" style="border-right-color: ${positionColor};">
+                            <div class="leaderboard-content">
+                                <div class="user-info">
+                                    <div class="position">
+                                        ${index + 1}${index === 0 ? ' 🥇' : index === 1 ? ' 🥈' : index === 2 ? ' 🥉' : ''}
+                                    </div>
+                                    <div class="user-details">
+                                        <h4>${user.displayName || 'لم يتم تعيين الاسم'}</h4>
+                                        <div class="user-rank">
+                                            <span style="font-size: 18px;">${rankInfo.icon}</span>
+                                            <span style="color: ${rankInfo.color}; font-weight: bold; font-size: 14px;">${rankInfo.name}</span>
                                         </div>
                                     </div>
-                                    <div class="rank-item-points">
-                                        ${rank.minPoints}${nextRank ? ` - ${nextRank.minPoints - 1}` : '+'} نقطة
-                                        ${playersInRank.length > 0 ? `<br><span style="font-size: 12px; color: #666;">(${playersInRank.length} لاعب)</span>` : ''}
-                                    </div>
                                 </div>
-                                ${playersInRank.length > 0 ? `
-                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                                        ${playersInRank.map((player, playerIndex) => {
-                                            const globalPosition = usersData.findIndex(u => u.uid === player.uid) + 1;
-                                            return `
-                                                <div style="margin: 5px 0; padding: 5px 8px; background: rgba(${rank.color.replace('#', '')}, 0.1); border-radius: 6px; font-size: 13px;">
-                                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                        <span style="font-weight: bold; color: ${rank.color};">#${globalPosition} ${player.displayName || 'لم يتم تعيين الاسم'}</span>
-                                                        <span style="color: #666;">${player.points || 0} نقطة</span>
-                                                    </div>
-                                                </div>
-                                            `;
-                                        }).join('')}
-                                    </div>
-                                ` : ''}
+                                <div class="user-points">
+                                    ${user.points || 0} نقطة
+                                </div>
                             </div>
-                        `;
-                    }).join('')}
+                        </div>
+                    `;
+                });
+                leaderboardHtml += '</div>';
+                leaderboardContent.innerHTML = leaderboardHtml;
 
-                    <div class="modal-tip">
-                        💡 اكسب نقاط أكثر للوصول إلى رتب أعلى!
-                    </div>
+            } catch (error) {
+                leaderboardContent.innerHTML = 'Failed to load leaderboard.';
+                console.error("Error loading leaderboard: ", error);
+            }
+        }
+
+        // Load all users points (this seems redundant with loadLeaderboard, adjust as needed)
+        window.loadAllUsersPoints = async function() {
+            const allUsersPointsList = document.getElementById('allUsersPointsList');
+            allUsersPointsList.innerHTML = `
+                <div class="leaderboard">
+                    <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">جاري التحميل...</h4>
                 </div>
             `;
 
-            document.body.appendChild(modal);
-
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
-
-        // Load all users points
-        window.loadAllUsersPoints = async function() {
             try {
                 const usersRef = collection(db, 'users');
                 const querySnapshot = await getDocs(usersRef);
@@ -1707,7 +912,6 @@
 
                 validUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
 
-                const allUsersPointsList = document.getElementById('allUsersPointsList');
                 allUsersPointsList.innerHTML = `
                     <div class="leaderboard">
                         <h4 style="text-align: center; color: #667eea; margin-bottom: 20px;">(${validUsers.length})</h4>
@@ -1771,27 +975,36 @@
                             uid: userData.uid,
                             email: userData.email,
                             displayName: userData.displayName,
-                            points: userData.points || 0
+                            points: userData.points || 0,
+                            isAdmin: userData.isAdmin || false
                         };
 
                         localStorage.setItem('userSession', JSON.stringify(updatedUserInfo));
+                        currentUser = updatedUserInfo; // Update current user state
                         showProfile(updatedUserInfo);
+                        toggleSections(); // Re-toggle sections to ensure correct display
                         showMessage('تم تحديث النقاط! ✨');
                         return;
                     }
                 }
 
-                // For Firebase auth users
+                // Fallback for Firebase auth users if session data is somehow incomplete or missing
                 if (auth.currentUser) {
                     const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
                     const userData = userDoc.exists() ? userDoc.data() : {};
 
-                    showProfile({
+                    const updatedUserInfo = {
                         uid: currentUser.uid,
                         email: currentUser.email,
-                        displayName: userData.displayName || '',
-                        points: userData.points || 0
-                    });
+                        displayName: userData.displayName || currentUser.displayName || '',
+                        points: userData.points || 0,
+                        isAdmin: userData.isAdmin || false
+                    };
+
+                    localStorage.setItem('userSession', JSON.stringify(updatedUserInfo));
+                    currentUser = updatedUserInfo;
+                    showProfile(updatedUserInfo);
+                    toggleSections();
                     showMessage('Points refreshed!');
                 }
             } catch (error) {
@@ -1822,7 +1035,7 @@
                 return;
             }
 
-            if (!confirm(`Delete user "${identifier}"?`)) {
+            if (!confirm(`Are you sure you want to delete user with email "${identifier}"?`)) {
                 return;
             }
 
@@ -1830,11 +1043,9 @@
                 const usersRef = collection(db, 'users');
                 let q;
 
-                if (identifier.includes('@')) {
-                    q = query(usersRef, where('email', '==', identifier));
-                } else {
-                    q = query(usersRef, where('displayName', '==', identifier));
-                }
+                // Assuming identifier is always email for deletion
+                q = query(usersRef, where('email', '==', identifier));
+
 
                 const querySnapshot = await getDocs(q);
 
@@ -1846,8 +1057,9 @@
                 const userDoc = querySnapshot.docs[0];
                 const userData = userDoc.data();
 
+                // Prevent deleting the main admin account
                 if (userData.email === 'mahmod@gmail.com') {
-                    showMessage('Cannot delete admin account.', 'error');
+                    showMessage('Cannot delete the main admin account.', 'error');
                     return;
                 }
 
@@ -1855,6 +1067,7 @@
 
                 showMessage('User deleted successfully!');
 
+                // Refresh the user list if it's visible
                 if (document.getElementById('usersList').innerHTML) {
                     loadAllUsers();
                 }
@@ -1866,13 +1079,11 @@
         // Logout function
         window.logout = async function() {
             try {
-                if (auth.currentUser) {
-                    await signOut(auth);
-                } else {
-                    currentUser = null;
-                    localStorage.removeItem('userSession');
-                    showLogin();
-                }
+                await auth.signOut();
+                currentUser = null;
+                isAdmin = false;
+                localStorage.removeItem('userSession');
+                showLogin();
                 showMessage('تم تسجيل الخروج بنجاح! 👋');
             } catch (error) {
                 showMessage(error.message, 'error');
@@ -1883,6 +1094,15 @@
         window.addEventListener('load', () => {
             if (!checkSavedSession()) {
                 showLogin();
+            } else {
+                // If session is saved, directly show the main section and toggle based on admin status
+                toggleSections();
+                // Load initial data for admin/user sections if needed
+                if(isAdmin) {
+                    loadAllUsers();
+                    displayCurrentPin();
+                    loadPointRequests();
+                }
             }
         });
     </script>

@@ -2648,7 +2648,7 @@
                 height: 100vh;
                 border-radius: 0;
                 box-shadow: none;
-                padding-bottom: 20px;
+                padding-bottom: 50px;
             }
 
             .chat-toggle-btn {
@@ -2686,9 +2686,9 @@
             }
 
             .chat-input-container {
-                padding: 15px 15px 25px 15px;
+                padding: 15px 15px 35px 15px;
                 gap: 10px;
-                margin-bottom: 10px;
+                margin-bottom: 30px;
             }
 
             .chat-input {
@@ -3510,7 +3510,7 @@
             const timeUntilNextPoint = chatRewardsData.lastPointTime > 0 ? 
                 Math.max(0, 3600000 - (now - chatRewardsData.lastPointTime)) : 0;
             
-            const messagesNeeded = Math.max(0, 30 - chatRewardsData.validMessages);
+            const messagesNeeded = Math.max(0, 10 - chatRewardsData.validMessages);
             const timeSinceLastMessage = now - chatRewardsData.lastMessageTime;
             const timeUntilNextMessage = Math.max(0, 15000 - timeSinceLastMessage);
             
@@ -3525,7 +3525,7 @@
                 statusText = `⏰ انتظار: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 statusColor = '#ffc107';
             } else if (messagesNeeded > 0) {
-                statusText = `💬 تحتاج ${messagesNeeded} رسالة للنقطة التالية`;
+                statusText = `💬 ارسل ${messagesNeeded} رسائل لتحصل على نقطة`;
                 statusColor = '#17a2b8';
             } else {
                 statusText = '🎉 جاهز للحصول على نقطة!';
@@ -3563,7 +3563,7 @@
                 startMessageTimer();
                 
                 // التحقق من إمكانية الحصول على نقطة
-                if (chatRewardsData.validMessages >= 30 && chatRewardsData.canEarnPoint) {
+                if (chatRewardsData.validMessages >= 10 && chatRewardsData.canEarnPoint) {
                     await awardChatPoint();
                 }
                 
@@ -3641,7 +3641,7 @@
                             تهانينا!
                         </h2>
                         <p style="font-size: 18px; margin: 15px 0; opacity: 0.9; line-height: 1.5;">
-                            لقد أكملت <strong>30 رسالة</strong> وحصلت على نقطة مكافأة! 🌟
+                            لقد أكملت <strong>10 رسائل</strong> وحصلت على نقطة مكافأة! 🌟
                         </p>
                         <div style="
                             background: rgba(255, 255, 255, 0.2);
@@ -3818,7 +3818,7 @@
 
                 // إرسال إشعار للدردشة
                 await addDoc(collection(db, 'chatMessages'), {
-                    message: `🎉 ${userInfo.displayName} حصل على نقطة مكافأة من الدردشة! (30 رسالة)`,
+                    message: `🎉 ${userInfo.displayName} حصل على نقطة مكافأة من الدردشة! (10 رسائل)`,
                     senderName: 'النظام',
                     senderUid: 'system',
                     timestamp: serverTimestamp(),
